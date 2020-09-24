@@ -28,27 +28,13 @@ def fd_laplace(m, d):
         T = sparse.kron(eye, T_bar) + sparse.kron(T_bar, eye)
     return(T)
 
-#m = 10
+m = 10
 
-#A_1 = fd_laplace(m, d=1)
-
-#print("A_1 =\n {}\n".format(A_1.toarray()))
-
-#A_2 = fd_laplace(m, d=2)
-
-#print("A_2 =\n {}\n".format(A_2.toarray()))
-
-#lam, V = np.linalg.eigh(A_1.toarray())
-
-#print("lam = {}\n".format(lam))
-
-#print("V = {}\n".format(V))
-
-#print("V.T @ np.diag(lam) @ V = {}\n".format(V.T @ np.diag(lam) @ V))
-
-#x = np.random.rand(m**2)
-
-#b = A_2.dot(x)
+A_1 = fd_laplace(m, d=1)
+A_2 = fd_laplace(m, d=2)
+lam, V = np.linalg.eigh(A_1.toarray())
+x = np.random.rand(m**2)
+b = A_2.dot(x)
 
 
 def fast_poisson(V, W, mu, lam, b):
@@ -71,6 +57,10 @@ def fast_poisson(V, W, mu, lam, b):
     u = np.reshape(U, m*m)
     #print("u = {}\n".format(u))
     return(u)
+
+print("#--------------- Solver section ---------------#")
+x_sol = fast_poisson(V, V, lam, lam, b)
+print("Norm Difference fast poisson: \n{}\n".format(np.linalg.norm(x-x_sol)))
 
 def solver_poisson(u_guess, nu, y_d, f, m, test, tol=10^-6, maxIter = 5):
     A_small = fd_laplace(m, d=1)
@@ -103,12 +93,12 @@ def solver_poisson(u_guess, nu, y_d, f, m, test, tol=10^-6, maxIter = 5):
     res = right_side - (eye_nu.dot(u) + u_res_2)
     k = 0
     print("k = {0}, \nu = {1}\n".format(k,u))
-    while np.linalg.norm(res) >= tol and k <= maxIter:
+    while np.linalg.norm(res) >= tol and k < maxIter:
         # update u with formula u_k+1 = u_k + M^-1 r_k with M^-1 = A^2
         u = u + A.dot(A.dot(res))
         # update residual
-        u_res = fast_poisson(V, V, lam, lam, u)
-        u_res_2 = fast_poisson(V, V, lam, lam, u_res) # = A^-2
+        u_res = fast_poisson(V, V, lam, lam, u) #=A^-1*u
+        u_res_2 = fast_poisson(V, V, lam, lam, u_res) # = A^-2*u
         res = right_side - (eye_nu.dot(u) + u_res_2) # residual_k = f - (nu*Id + A^-2)u_k
         
         # update counter
@@ -117,7 +107,7 @@ def solver_poisson(u_guess, nu, y_d, f, m, test, tol=10^-6, maxIter = 5):
     return(u, k)
 
 
-m = 2
+m = 3
 nu = 0.5
 
 
@@ -147,10 +137,16 @@ f  = (-1)*(nu* A.dot(A.dot(u_sol)) + u_sol - A.dot(y_d))
 u_guess = np.zeros(m**2)
 #u_guess[0] = 1
 
+print("#--------------- Algorithm section ---------------#")
+
 u_test, it = solver_poisson(u_guess, nu, y_d, f, m, test=right_hand_side)
+
+print("#--------------- Result section ---------------#")
 
 print("\nu_sol = {}\n".format(u_sol))
 
 print("u_test = {}\n".format(u_test))
 
 print("Norm of difference = {}\n".format(np.linalg.norm(u_test-u_sol)))
+
+
