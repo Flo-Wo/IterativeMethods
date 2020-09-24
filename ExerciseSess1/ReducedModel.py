@@ -13,6 +13,19 @@ from scipy.sparse.linalg import cg
 from scipy.sparse.linalg import LinearOperator
 import matplotlib.pyplot as plt
 
+"""
+TO DO:
+    - implement fast poisson using the calculated eigenvalues 
+    and eigenvectors
+    - implement poisson solver vectorized using only one loop
+    - plot behaviour of the methods for different m and nu
+    - compare both systems for increasing and decreasing nu
+    - find nu for which Jacobi converges
+    - compare both solvers to damped jacobi
+    - calculate the conditional number based on nu
+"""
+
+
 def fd_laplace(m, d):
     if d == 1:
         # build matrix blocks 
@@ -22,12 +35,12 @@ def fd_laplace(m, d):
         T = four + onesUpper + onesLower
 
     elif d == 2:
+        # use kronecker product to get 2D laplacian matrix
         four = -2*sparse.identity(m)
         onesUpper = sparse.eye(m, k=1)
         onesLower = sparse.eye(m, k=-1)
         T_bar = four + onesUpper + onesLower
         eye = sparse.eye(m)
-        
         T = sparse.kron(eye, T_bar) + sparse.kron(T_bar, eye)
     return(T)
 
@@ -83,13 +96,13 @@ def solver_poisson_factored(u_guess, nu, y_d, f, m,tol=1e-12):
     right_side = A.dot(y_d)-f
 
     # define linear operator of the left side for the cg method
-    def left(v):
+    def left_side(v):
         result = (nu*(A.dot(A))).dot(v)+(sparse.identity(m**2)).dot(v)
         return(result)
-    left_operator = LinearOperator((m**2, m**2), left)
+    left_side_op = LinearOperator((m**2, m**2), left_side)
     
     # solve system using cg method
-    u,info = cg(left_operator,right_side,x0=u_guess,tol=tol, callback=callback)
+    u,info = cg(left_side_op,right_side,x0=u_guess,tol=tol, callback=callback)
     
     return(u,info,num_iters,res)
     
@@ -134,8 +147,8 @@ def solver_poisson(u_guess,nu, y_d, f,m, tol=1e-12):
     u,info = cg(operator,right_side,x0=u_guess,tol=tol,callback=callback)
     return(u,info,num_iters,res)
 
-m = 10
-nu = 10000
+m = 100
+nu = 1
 
 
 y_d = 10*np.ones(m**2)
@@ -154,10 +167,25 @@ u_guess = np.random.rand(m**2)
 u_test,info,num_iters,res = solver_poisson_factored(u_guess, nu, y_d, f,m)
 
 x = np.arange(0,num_iters)
-plt.semilogy(x,res)
-plt.title('Konvergenzverhalten')
+plt.semilogy(x,res,"x-", label="factored")
 
 print("Number of iterations = {}\n".format(num_iters))
-
-
 print("||u_sol - u_test|| = {}\n".format(np.linalg.norm(u_test-u_sol)))
+
+print("#------------- Unfacored system -------------#")
+
+u_test,info,num_iters,res = solver_poisson(u_guess, nu, y_d, f,m)
+
+x = np.arange(0,num_iters)
+plt.semilogy(x,res, label="unfactored")
+plt.title("Konvergenzverhalten, nu = {0}, m = {1}".format(nu, m))
+
+print("Number of iterations = {}\n".format(num_iters))
+print("||u_sol - u_test|| = {}\n".format(np.linalg.norm(u_test-u_sol)))
+
+plt.legend(loc="upper right")
+plt.xlabel("number of iteration")
+plt.ylabel("Norm Residual")
+plt.show()
+
+
