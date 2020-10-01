@@ -160,7 +160,7 @@ def solver_poisson(u_guess,nu, y_d, f, m, tol=1e-12, disp=False):
         res.append(frame.f_locals['resid'])
 
     # create 1D and 2D laplacian matrices
-    A_small = fd_laplace(m, d=1)
+    #A_small = fd_laplace(m, d=1)
     #A = fd_laplace(m, d=2)
     
     # get decomposition

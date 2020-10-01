@@ -8,12 +8,11 @@ Created on Thu Oct  1 16:06:51 2020
 
 import numpy as np
 from ReducedModel import fd_laplace, solver_poisson, solver_poisson_factored
-
 import matplotlib.pyplot as plt
 plt.close('all')
 
 
-def test_normal(nu_start, m, steps, plot="nu"):
+def test_normal(nu_start, m, plot="nu"):
     y_d = 10*np.ones(m**2)
     
     u_sol = np.random.rand(m**2)
@@ -23,8 +22,7 @@ def test_normal(nu_start, m, steps, plot="nu"):
     A = fd_laplace(m,d=2)
     
     
-    for i in range(0, steps):
-        nu = nu_start * 10**i
+    for nu in nu_start:
         f  = (-1)*(nu* A.dot(A.dot(u_sol)) + u_sol - A.dot(y_d))
         u_test,info,num_iters,res = solver_poisson(u_guess, nu, y_d, f,m)
         x = np.arange(0,num_iters)
@@ -34,7 +32,7 @@ def test_normal(nu_start, m, steps, plot="nu"):
             plt.semilogy(x,res, label="m = {}".format(m))
         
 
-def test_factored(nu_start, m, steps, plot="nu"):
+def test_factored(nu_start, m, plot="nu"):
     y_d = 10*np.ones(m**2)
     
     u_sol = np.random.rand(m**2)
@@ -44,8 +42,7 @@ def test_factored(nu_start, m, steps, plot="nu"):
     A = fd_laplace(m,d=2)
     
     
-    for i in range(0, steps):
-        nu = nu_start * 10**i
+    for nu in nu_start:
         f  = (-1)*(nu* A.dot(A.dot(u_sol)) + u_sol - A.dot(y_d))
         u_test,info,num_iters,res = solver_poisson_factored(u_guess, nu, y_d, f,m)
         x = np.arange(0,num_iters)
@@ -59,14 +56,13 @@ def test_factored(nu_start, m, steps, plot="nu"):
 # fixed m
 #------------------
 
-
 # ===============================
 # Test normal system, fixed m
 # ===============================
-nu = 0.001
+nu = [0.001 * 10**i for i in range(0,6)]
 m = 32
 step = 6
-test_normal(nu, m, step, plot="nu")
+test_normal(nu, m, plot="nu")
 
 plt.title("converence behaviour of the normal system, m = {1}".format(nu, m))
 plt.legend(loc="upper right")
@@ -79,7 +75,7 @@ plt.show()
 # ===============================
 
 
-test_factored(nu, m, step, plot="nu")
+test_factored(nu, m, plot="nu")
     
 plt.title("convergence behaviour of the factored system, m = {1}".format(nu, m))
 plt.legend(loc="upper right")
@@ -91,14 +87,13 @@ plt.show()
 # fixed nu
 #------------------
 
-
 # ===============================
 # Test normal system, fixed nu
 # ===============================
-nu = 0.01
+nu = [0.01]
 step = 1
 for i in range(1, 6):
-    test_normal(nu, 2**i, step, plot="m")
+    test_normal(nu, 2**i, plot="m")
 
 plt.title("converence behaviour of the normal system, nu = {0}".format(nu, m))
 plt.legend(loc="upper right")
@@ -111,7 +106,7 @@ plt.show()
 # ===============================
 
 for i in range(1, 6):
-    test_factored(nu, 2**i, step, plot="m")
+    test_factored(nu, 2**i, plot="m")
     
 plt.title("convergence behaviour of the factored system, nu = {0}".format(nu, m))
 plt.legend(loc="upper right")
