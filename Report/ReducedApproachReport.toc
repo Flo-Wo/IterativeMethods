@@ -1,0 +1,13 @@
+\contentsline {section}{\tocsection {}{1}{Introduction}}{1}
+\contentsline {section}{\tocsection {}{2}{Stationary Methods}}{1}
+\contentsline {subsection}{\tocsubsection {}{2.1}{Deriving the Optimality System}}{1}
+\contentsline {subsection}{\tocsubsection {}{2.2}{Laplace Matrices}}{2}
+\contentsline {subsection}{\tocsubsection {}{2.3}{Fast Poisson Solver}}{3}
+\contentsline {subsection}{\tocsubsection {}{2.4}{Convergence Analysis}}{3}
+\contentsline {subsection}{\tocsubsection {}{2.5}{Damped Jacobi}}{3}
+\contentsline {section}{\tocsection {}{3}{Krylov Methods}}{3}
+\contentsline {subsection}{\tocsubsection {}{3.1}{Convergence Analysis}}{4}
+\contentsline {subsection}{\tocsubsection {}{3.2}{Conditional Number}}{4}
+\contentsline {section}{\tocsection {}{4}{Multigrid}}{4}
+\contentsline {subsection}{\tocsubsection {}{4.1}{Stationary Method as Smoother}}{4}
+\contentsline {subsection}{\tocsubsection {}{4.2}{Damped Jacobi as Smoother}}{4}

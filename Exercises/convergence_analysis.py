@@ -108,6 +108,7 @@ def test_jacobi(nu_start, m, omega, plot="nu"):
             plt.semilogy(x,res, label="m = {}".format(m))
 
 
+
 # # # #### Test multigrid jacobi
 
 # l = 4
