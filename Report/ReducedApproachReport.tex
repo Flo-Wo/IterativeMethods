@@ -1,0 +1,135 @@
+\documentclass[twoside,reqno, 10pt, headinclude, footinclude]{amsart}
+
+\usepackage[utf8]{inputenc}
+%\usepackage[ngerman]{babel}
+%\usepackage[T1]{fontenc}
+%     If your article includes graphics, uncomment this command.
+\usepackage{graphicx}
+
+\usepackage[foot]{amsaddr}
+
+
+%    Blank box placeholder for figures (to avoid requiring any
+%    particular graphics capabilities for printing this document).
+\newcommand{\blankbox}[2]{%
+  \parbox{\columnwidth}{\centering
+%    Set fboxsep to 0 so that the actual size of the box will match the
+%    given measurements more closely.
+    \setlength{\fboxsep}{0pt}%
+    \fbox{\raisebox{0pt}[#2]{\hspace{#1}}}%
+  }%
+}
+
+\usepackage{scrlayer-scrpage} %Kopf- und Fußzeile selbst festlegen
+\pagestyle{scrheadings}
+\clearpairofpagestyles
+%\cehead{\small{\textsc{Florian Wolf}}}
+%\cohead{\small{\textsc{Fourier-Transformation auf $\mathbb{R}$}}}
+\cefoot{\small{\pagemark}}
+\cofoot{\small{\pagemark}}
+
+\usepackage[hidelinks]{hyperref}
+
+\usepackage{enumerate}
+
+\usepackage[left=2.5cm,right=2.5cm,top=2.6cm,bottom=1.4cm,includefoot]{geometry}
+\setlength{\footskip}{30pt}
+\usepackage{csquotes}
+
+%\usepackage[backend=biber, style=alphabetic, citestyle=alphabetic-verb]{biblatex} %Zitate mit BibTeX  %, sorting=none "richtige" Reihenfolge der Nummern
+%\bibliography{Proseminar-Literatur}
+
+%\renewenvironment{proof}{\newline\textsc{Beweis:}\normalfont}{\hfill$\square$}
+
+% eigene Befehle
+
+\DeclareMathOperator{\id}{id}
+\DeclareMathOperator{\Id}{Id}
+\DeclareMathOperator{\Real}{Re}
+\DeclareMathOperator{\Imag}{Im}
+
+\def\R{{\mathbb{R}}}
+\def\N{{\mathbb{N}}}
+\def\C{{\mathbb{C}}}
+\def\K{{\mathbb{K}}}
+\def\Q{{\mathbb{Q}}}
+\def\Z{{\mathbb{Z}}}
+\def\O{{\mathcal{O}}}
+\def\P{{\mathcal{P}}}
+\def\B{{\mathcal{B}}}
+\def\U{{\mathcal{U}}}
+\def\F{{\mathbb{F}}}
+\def\M{{\mathcal{M}}}
+\def\S{{\mathcal{S}}}
+\def\MR{{\mathcal{M}(\R)}}
+\def\SR{{\mathcal{S}(\R)}}
+
+\newcommand{\falls}{, \: \mathrm{falls} \;}
+\def\sonst{{, \: \mathrm{sonst} \;}}
+
+\def\theta{{\vartheta}}
+\def\phi{{\varphi}}
+\def\epsilon{{\varepsilon}}
+
+\newcommand{\mi}{\mathbf{i}}
+\newcommand{\e}[1]{\mathrm{e}^{#1}}
+\newcommand{\conj}[1]{%
+  \overline{#1}%
+}
+
+%    Absolute value notation
+\newcommand{\abs}[1]{\left| #1 \right|}
+
+
+% Theorem etc
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{satz}[theorem]{Satz}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Korollar}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{beispiel}[theorem]{Beispiel}
+\newtheorem{notation}[theorem]{Notation}
+\newtheorem{bemerkung}[theorem]{Bemerkung}
+\newtheorem{erinnerung}[theorem]{Erinnerung}
+\newtheorem{motivation}[theorem]{Motivation}
+\newtheorem{beobachtung}[theorem]{Beobachtung}
+\newtheorem{anwendung}[theorem]{Anwendung}
+\newtheorem*{bem*}{Bemerkung}
+
+
+\numberwithin{equation}{section}
+\setcounter{tocdepth}{1}
+
+
+
+\begin{document}
+
+\title[Reduced approach]{Solving an optimal control problem using stationary and iterative solvers and multigrid}
+
+%    Information for first author
+\author{Than-Van, Michael Thiele, Florian Wolf}
+\email{\url{florian.2.wolf@uni-konstanz.de}}
+\date{\today}
+
+
+\begin{abstract}
+This is a test.
+\end{abstract}
+\maketitle
+\tableofcontents
+
+%\setcounter{section}{5}
+
+%%
+%% -----------------------------------
+%% Chapter 1
+%% -----------------------------------
+%%
+\section{Introduction}
+
+%\printbibliography
+\end{document}
