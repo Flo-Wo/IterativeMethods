@@ -17,142 +17,83 @@ from ReducedModel import fd_laplace, solver_poisson_unfactored_cg, solver_poisso
 import matplotlib.pyplot as plt
 plt.close('all')
 
+def plot_convergenceRate():
+    plt.figure(figsize = (30, 30))
+    j = 1
+    for k in range(4):
+        nu = 0.01 * 10**k
+        for l in range(4,7):
+            # create test vectors to get the system behaviour
+            m = 2**l-1
+            y_d = 10*np.ones(m**2)
+            
+            u_sol = np.random.rand(m**2)
+            
+            u_guess = np.random.rand(m**2)
+            
+            A = fd_laplace(m,d=2)
+    
+            # calculate f, as the real solutions is already known
+            f  = (-1)*(nu* A.dot(A.dot(u_sol)) + u_sol - A.dot(y_d))
+            # use the solver of the unfactored system
+            u_test,info ,num_iters ,res = solver_poisson_unfactored_cg(u_guess, nu, y_d, f, m)
+            u_test_factored,info_factored,num_iters_factored,res_factored = \
+                solver_poisson_factored_cg(u_guess, nu, y_d, f, m)
+            x = np.arange(0, num_iters)
+            x_factored = np.arange(0, num_iters_factored)
+            plt.subplot(4,3,j)
+            plt.semilogy(x, res, "r-", label="initial system")
+            plt.semilogy(x_factored, res_factored, "b-", label="factored system")
+            plt.legend(loc="upper right")
+            plt.title(r"$m =$ {0}, $\nu =$ {1}".format(m, nu))
+            j+=1
+    plt.tight_layout()
+    plt.show()
 
-
-
-def test_normal(nu_start, m, plot="nu"):
-    y_d = 10*np.ones(m**2)
-    
-    u_sol = np.random.rand(m**2)
-    
-    u_guess = np.random.rand(m**2)
-    
-    A = fd_laplace(m,d=2)
-    
-    
-    for nu in nu_start:
-        f  = (-1)*(nu* A.dot(A.dot(u_sol)) + u_sol - A.dot(y_d))
-        u_test,info,num_iters,res = solver_poisson_unfactored_cg(u_guess, nu, y_d, f, m)
-        x = np.arange(0,num_iters)
-        if plot == "nu":
-            plt.semilogy(x,res, label="nu = {}".format(nu))
-        else:
-            plt.semilogy(x,res, label="m = {}".format(m))
-        
-
-def test_factored(nu_start, m, plot="nu"):
-    y_d = 10*np.ones(m**2)
-    
-    u_sol = np.random.rand(m**2)
-    
-    u_guess = np.random.rand(m**2)
-    
-    A = fd_laplace(m,d=2)
-    
-    
-    for nu in nu_start:
-        f  = (-1)*(nu* A.dot(A.dot(u_sol)) + u_sol - A.dot(y_d))
-        u_test,info,num_iters,res = solver_poisson_factored_cg(u_guess, nu, y_d, f, m)
-        x = np.arange(0,num_iters)
-        if plot == "nu":
-            plt.semilogy(x,res, label="nu = {}".format(nu))
-        else:
-            plt.semilogy(x,res, label="m = {}".format(m))
-
-
-plt.figure(figsize = (30, 30))
-j = 1
-for k in range(4):
-    nu = 0.01 * 10**k
+def plot_conditionNumber():       
+    plt.figure(figsize = (15, 25))
+    j = 1
     for l in range(4,7):
-        # create test vectors to get the system behaviour
+        cond = []
+        cond_factored = []
+        nu_values = []
         m = 2**l-1
-        y_d = 10*np.ones(m**2)
-        
-        u_sol = np.random.rand(m**2)
-        
-        u_guess = np.random.rand(m**2)
-        
-        A = fd_laplace(m,d=2)
-
-        # calculate f, as the real solutions is already known
-        f  = (-1)*(nu* A.dot(A.dot(u_sol)) + u_sol - A.dot(y_d))
-        # use the solver of the unfactored system
-        u_test,info ,num_iters ,res = solver_poisson_unfactored_cg(u_guess, nu, y_d, f, m)
-        u_test_factored,info_factored,num_iters_factored,res_factored = \
-            solver_poisson_factored_cg(u_guess, nu, y_d, f, m)
-        x = np.arange(0, num_iters)
-        x_factored = np.arange(0, num_iters_factored)
-        plt.subplot(4,3,j)
-        plt.semilogy(x, res, "r-", label="initial system")
-        plt.semilogy(x_factored, res_factored, "b-", label="factored system")
+        for k in range(4):
+            nu = 0.01 * 10**k
+            nu_values.append(nu)
+            cond.append(condition_number_normal(m, nu))
+            cond_factored.append(condition_number_factored(m, nu))
+        plt.subplot(2,4,j)
+        plt.semilogx(nu_values, cond,"r-", label="initial system")
+        plt.semilogx(nu_values, cond_factored,"b-", label="factored system")
+        plt.xticks(nu_values)
+        plt.yscale("log")
         plt.legend(loc="upper right")
-        plt.title(r"$m =$ {0}, $\nu =$ {1}".format(m, nu))
+        plt.title(r"$m =$ {}".format(m))
+        plt.xlabel(r"values of $\nu$")
+        plt.ylabel("condition number of the system")
+    
         j+=1
-plt.tight_layout()
-plt.show()
-        
-        
+    plt.tight_layout()
+    plt.show()
+    
+plot_convergenceRate()
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
     
-# #------------------
-# # fixed m
-# #------------------
-
-# # ===============================
-# # Test normal system, fixed m
-# # ===============================
-# nu = [0.01 * 10**i for i in range(0,4)]
-# m = 31
-# step = 6
-# test_normal(nu, m, plot="nu")
-
-# plt.title("convergence behaviour of the normal system (cg), m = {1}".format(nu, m))
-# plt.legend(loc="upper right")
-# plt.xlabel("number of iterations")
-# plt.ylabel("Norm of the  residuals")
-# plt.show()
-
-# # ===============================
-# # Test factored system, fixed m
-# # ===============================
-
-
-# test_factored(nu, m, plot="nu")
-    
-# plt.title("convergence behaviour of the factored system (cg), m = {1}".format(nu, m))
-# plt.legend(loc="upper right")
-# plt.xlabel("number of iterations")
-# plt.ylabel("Norm of the  residuals")
-# plt.show()
-
-# #------------------
-# # fixed nu
-# #------------------
-
-# # ===============================
-# # Test normal system, fixed nu
-# # ===============================
-# nu = [0.1]
-# step = 1
-# for i in range(4, 7):
-#     test_normal(nu, 2**i-1, plot="m")
-
-# plt.title("convergence behaviour of the normal system (cg), nu = {0}".format(nu, m))
-# plt.legend(loc="upper right")
-# plt.xlabel("number of iterations")
-# plt.ylabel("Norm of the  residuals")
-# plt.show()
-
-# # ===============================
-# # Test factored system, fixed nu
-# # ===============================
-# nu = [10]
-# for i in range(4, 7):
-#     test_factored(nu, 2**i-1, plot="m")
-    
-# plt.title("convergence behaviour of the factored system (cg), nu = {0}".format(nu, m))
-# plt.legend(loc="upper right")
-# plt.xlabel("number of iterations")
-# plt.ylabel("Norm of the  residuals")
-# plt.show()

@@ -30,6 +30,7 @@
 \renewcommand{\vec}{\textbf}
 \usepackage{graphicx}
 \usepackage[left=2cm,right=2cm,top=2.6cm,bottom=1.4cm,includefoot]{geometry}
+\usepackage{hyperref}
 
 
 \begin{document}
@@ -58,7 +59,7 @@ In the exercises we studied optimal control problems governed by the Laplace equ
 \begin{equation*}
 \min\limits_{\underline{y},\underline{u}\in\Omega} J(\underline{y},\underline{u}) := \frac{1}{2}\ ||\underline{y}-\underline{y_d}||_{L^2(\Omega)}^2 + \frac{\nu}{2}\ ||\underline{u}||_{L^2(\Omega)}^2
 \end{equation*}
-with norm
+with discretized norm
 \begin{equation*}
 ||\underline{x}||_{L^2(\Omega)}^2 := h^2 \sum\limits_{j=1}^n \underline{x}_j^2
 \end{equation*}
@@ -176,22 +177,45 @@ Now, we solve the system (\ref{eq:normalOptimalitySystem}) by the stationary ite
 \underline{u}^{n+1} = -\frac{1}{\nu} A^{-2}\underline{u}^n + \frac{1}{\nu} A^{-1} (\underline{y}_d-A^{-1}\underline{f})
 \end{equation}
 and analyze its convergence behavior for different $m$ and $\nu$.
-
 %% ====================================================================
 
 \subsection{Damped Jacobi}
 
 %% ====================================================================
-
+\newpage
 \section{Krylov Methods}
-In this part of the project we want to use the fact that the matrix arising in our disretization is symmetric and positive definite. For this reason we want to apply the conjugated gradient (CG) method, to solve our systems \eqref{eq:normalOptimalitySystem} and \eqref{eq:factoredOptimalitySystem}.
-For the first system we use the already implemented fast poisson solver, to get a matrix free version of the system. In the second case we construct our sparse matrices and use the \texttt{scipy.sparse.linalg.LinearOperator} method, to create a linear operator of our left hand side of the equation.
-Looking at the plots below, we can see the following convergence behaviour for the both systems. In the plots $\nu$ ist getting bigger going from top to bottom and $m$ is getting bigger going from left to right.
+In this part of the project we want to use the fact, that the matrix arising in our disretization is symmetric and positive definite. For this reason we want to apply the conjugated gradient (CG) method, to solve our systems \eqref{eq:normalOptimalitySystem} and \eqref{eq:factoredOptimalitySystem}.
+For the first system we use the already implemented fast poisson solver, to get a matrix free version of the system. In the second case we construct our sparse matrices and use the \texttt{scipy.sparse.linalg.LinearOperator} method, to create a linear operator of our left-hand side of the equation.
+Looking at figure \ref{fig:CG-convergence}, we can see the  convergence behaviour for the two systems. In the plots $\nu$ ist getting bigger going from top to bottom and $m$ is getting bigger going from left to right.
 \begin{figure}[h!]
 \centering
-\includegraphics[scale=0.37]{./imgs/CG_analysis}
-\caption{Convergence behaviour for different values of $m$ and $\nu$}
+\includegraphics[scale=0.45]{./imgs/CG_analysis}
+\caption{Convergence behaviour for different values of $m$ and $\nu$ using CG to solve the systems. The x-axis is representing the number of iterations
+and the y-axis the 2-norm of the residuals.}
+\label{fig:CG-convergence}
 \end{figure}
+As you can directly see in the plots, the solution process of both systems is getting worse, as the size of the matrix increases. Meanwhile, the behaviour 
+regarding different values of $\nu$ is more interesting. While the convergence of the initial optimality systems solution is getting slower and slower if 
+$\nu$ increases, the convergence rate of the factored system is getting faster and faster. So the systems behave in an opposite way, regarding the size of 
+$\nu$.
+
+
+One can explain this, if we take a closer look at the conditon numbers of the systems for the upper combinations of $\nu$ and $m$. We can see this in the 
+figure \ref{fig:CG-conditionNumber}.
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.65]{./imgs/CG_conditionNumber}
+\caption{Condition numbers of both systems for different values of $m$ and $\nu$ represented in a double-logarithmic plot.}
+\label{fig:CG-conditionNumber}
+\end{figure}
+The three plots of the condition number explain really good, why we get the upper type of convergence behaviour. While both condition numbers get overall
+bigger from left to right (so with increasing matrix size $m$), one can clearly see in each of the plots that the systems have opposed curves. While the 
+factored system \eqref{eq:factoredOptimalitySystem} is worse conditioned for bigger $\nu$, the condition number of the initial system gets better
+the bigger $\nu$ is. Looking at the formulas \eqref{eq:normalOptimalitySystem} and \eqref{eq:factoredOptimalitySystem} this should now be really obvious.
+In \eqref{eq:factoredOptimalitySystem} we factor our matrix $A^2$ by $\nu$, so the bigger $\nu$ is, the worse the condition number gets. In the initial 
+system \eqref{eq:normalOptimalitySystem} the identity matrix with factor $\nu$ dominates the diagonal of the left-hand side and the condition number is 
+getting better and better.
+
 %% ====================================================================
 
 \subsection{Convergence Analysis}
