@@ -44,7 +44,7 @@
 %\dedicatory{Thanks Gabriele and Christian for your great work.}
 
 \begin{abstract}
-	This is a report about the findings of Thanh-Van Huynh, Michael Thiele and Florian Wolf in the exercises accompanying Iterative Methods for Linear Systems. The lecture was held by Jun.-Prof. Dr. Gabriele Ciaramella with the assistance of Christian Jäckle in the winter term 2020/21 at the University of Constance.
+	This is a report about the findings of Thanh-Van Huynh, Michael Thiele and Florian Wolf in the exercises accompanying Iterative Methods for Linear Systems. The lecture was held by Jun.-Prof. Dr. Gabriele Ciaramella with the assistance of Christian J\"ackle in the winter term 2020/21 at the University of Constance.
 \end{abstract}
 
 \maketitle
@@ -177,6 +177,34 @@ Now, we solve the system (\ref{eq:normalOptimalitySystem}) by the stationary ite
 \underline{u}^{n+1} = -\frac{1}{\nu} A^{-2}\underline{u}^n + \frac{1}{\nu} A^{-1} (\underline{y}_d-A^{-1}\underline{f})
 \end{equation}
 and analyze its convergence behavior for different $m$ and $\nu$.
+\subsubsection{Eigenvectors and eigenvalues of the laplace matrices}
+As we have seen in the section regarding the stationary solver and we will see this again, if we consider solving \eqref{eq:normalOptimalitySystem} 
+using the conjugated gradient method, the poisson solver is the key, to get a fast solution to the $A^{-1}$ problem. The solver requires a decomposition
+of the matrix $V$ in diagonalized form. In the beginning we achieved this task using \texttt{scipy.sparse.eigs}. Luckily the eigenvectors and eigenvalues
+of the one dimensional laplace matrix are easy to calculate by hand, exploiting its Toeplitz-structure. For the $m\times m$ one-dimensional laplace, we 
+get the following eigenvalues
+\begin{align*}
+\lambda_k = -2 + 2 \cos \left( \frac{\pi k}{n+1} \right), \quad k=1,\ldots, m
+\end{align*} 
+and the corresponding eigenvectors with entries
+\begin{align*}
+(\vec{v})_i = \sin\left(\frac{i\cdot \pi k}{m+1} \right), \quad i,k=1,\ldots,m
+\end{align*}
+Now we can include these manually to get a more exact and especially quicker solver.
+
+To get the eigenvectors and eigenvalues of the two-dimensional laplace matrix, we use problem 10 of REFERENCE TO THE BOOK and proof the third bullet point
+of it. Therefore we use the formula $(A \otimes B)(C \otimes D) = (AC) \otimes (BD)$. For $j,k \in \{1, \ldots, m\}$ arbitrary we get for $\lambda := 
+\lambda_j + \lambda_k$ and $\vec{v} := \vec{v}_j \otimes \vec{v}_k$ that
+\begin{align*}
+A\vec{v} &= \left(\text{I}_m \otimes T_1 + T_1 \otimes \text{I}_m \right) \vec{v}\\
+&= \left( \text{I}_m \otimes T_1\right)\left(\vec{v}_j \otimes \vec{v}_k\right) + \left( T_1 \otimes \text{I}_m\right)\left(\vec{v}_j \otimes \vec{v}_k\right)\\
+&= \left( \vec{v}_j \otimes \lambda_k \vec{v}_k\right) + \left( \lambda_j\vec{v}_j \otimes  \vec{v}_k\right)\\
+&= \lambda_k\left( \vec{v}_j \otimes  \vec{v}_k\right) + \lambda_j\left( \vec{v}_j \otimes  \vec{v}_k\right)\\
+&= \lambda \vec{v}
+\end{align*}
+Therefore the eigenvectors and eigenvalues of the two-dimensional laplace are obtained by using the kronecker product of the one-dimensional eigenvectors
+and summing up the one-dimensional eigenvalues. We will use the eigenvalues, to calculate the condition number of the matrix in the section
+about Krylov methods.
 %% ====================================================================
 
 \subsection{Damped Jacobi}
@@ -187,12 +215,17 @@ and analyze its convergence behavior for different $m$ and $\nu$.
 %% ====================================================================
 
 \subsection{Convergence Analysis}
-In this part of the project we want to use the fact, that the matrix arising in our disretization is symmetric and positive definite. For this reason we want to apply the conjugated gradient (CG) method, to solve our systems \eqref{eq:normalOptimalitySystem} and \eqref{eq:factoredOptimalitySystem}.
-For the first system we use the already implemented fast poisson solver, to get a matrix free version of the system. In the second case we construct our sparse matrices and use the \texttt{scipy.sparse.linalg.LinearOperator} method, to create a linear operator of our left-hand side of the equation.
+In this part of the project we want to use the fact, that the matrix arising in our disretization is symmetric and positive definite. For this reason we 
+want to apply the conjugated gradient (CG) method, to solve our systems \eqref{eq:normalOptimalitySystem} and \eqref{eq:factoredOptimalitySystem}.
+For the first system we use the already implemented fast poisson solver, to get a matrix free version of the left-hand side. In the second case we 
+construct our sparse matrices and use the \texttt{scipy.sparse.linalg.LinearOperator} method, to create a linear operator of our left-hand side of the 
+equation. So in both cases the solution process is completely matrix-free.
+
+
 Looking at figure \ref{fig:CG-convergence}, we can see the  convergence behaviour for the two systems. In the plots $\nu$ ist getting bigger going from top to bottom and $m$ is getting bigger going from left to right.
 \begin{figure}[h!]
 \centering
-\includegraphics[scale=0.46]{./imgs/CG_analysis}
+\includegraphics[scale=0.56]{./imgs/CG_analysis}
 \caption{Convergence behaviour for different values of $m$ and $\nu$ using CG to solve the systems. The x-axis is representing the number of iterations
 and the y-axis the 2-norm of the residuals.}
 \label{fig:CG-convergence}
