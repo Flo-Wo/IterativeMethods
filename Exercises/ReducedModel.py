@@ -824,6 +824,3 @@ def multigrid_stat(nu, f, u_guess, m, nu1, nu2, level):
         u_sol, res = vcycle_stat(nu, nu1, nu2, m, u_sol, f, level)
         k+=1
     return(u_sol, res, k)
-
-
-

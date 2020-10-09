@@ -31,6 +31,7 @@
 \usepackage{graphicx}
 \usepackage[left=2cm,right=2cm,top=2.6cm,bottom=1.4cm,includefoot]{geometry}
 \usepackage{hyperref}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
 
 
 \begin{document}
@@ -57,23 +58,28 @@
 \section{Introduction}
 In the exercises we studied optimal control problems governed by the Laplace equation. We want to solve
 \begin{align}
-\min\limits_{\underline{y},\underline{u}\in\Omega} J(\underline{y},\underline{u}) &:= \frac{1}{2}\ ||\underline{y}-\underline{y_d}||_{L^2(\Omega)}^2 + \frac{\nu}{2}\ ||\underline{u}||_{L^2(\Omega)}^2\\
+\min\limits_{\vec{y},\vec{u}\in\Omega} J(\vec{y},\vec{u}) &:= \frac{1}{2}\ \norm{\vec{y}-\vec{y}_d}
+_{L^2(\Omega)}^2 + \frac{\nu}{2}\ \norm{\vec{u}}_{L^2(\Omega)}^2\\
 \text{s.t. } -\Delta y &= f+ u \text{ in } \Omega\\
 y &= 0 \text{ on } \partial\Omega
-\label{eq:OptimalControlProblem}
 \end{align}
 for a regularization parameter $\nu > 0$. We are looking for a control function $u$. With discretized norm
 \begin{equation*}
-||\underline{x}||_{L^2(\Omega)}^2 := h^2 \sum\limits_{j=1}^n \underline{x}_j^2
+||\vec{x}||_{L^2(\Omega)}^2 := h^2 \sum\limits_{j=1}^n \vec{x}_j^2
 \end{equation*}
 such that
 \begin{equation*}
-A\underline{y}=\underline{f}+\underline{u}
+A\vec{y}=\vec{f}+\vec{u}
 \end{equation*}
-is satisfied. Notice that we do not have any boundary conditions. One possible way of finding a solution is the so-called reduced approach: We consider $\underline{y}$ as a function of $\underline{u}$, therefore obtaining the problem
+is satisfied. Notice that we do not have any boundary conditions. One possible way of finding a solution is the so-called reduced approach: We consider $\vec{y}$ as a function of $\vec{u}$, therefore obtaining the problem
 \begin{equation*}
-\min\limits_{\underline{u}\in\Omega} \hat{J}(\underline{u}) := J(\underline{y}(\underline{u}),\underline{u}).
+\min\limits_{\vec{u}\in\Omega} \hat{J}(\vec{u}) := J(\vec{y}(\vec{u}),\vec{u}).
 \end{equation*}
+
+
+%% ====================================================================
+%% ====================================================================
+%% ====================================================================
 
 %% ====================================================================
 
@@ -81,38 +87,41 @@ is satisfied. Notice that we do not have any boundary conditions. One possible w
 \subsection{Deriving the Optimality System}
 We see that
 \begin{equation*}
-||\underline{x}||_{L^2(\Omega)}^2 = h^2\ ||\underline{x}||_2^2
+||\vec{x}||_{L^2(\Omega)}^2 = h^2\ ||\vec{x}||_2^2
 \end{equation*}
-holds for arbitrary $x$. In combination with $\underline{y}=A^{-1}\left(\underline{f}+\underline{u}\right)$, we obtain
+holds for arbitrary $x$. In combination with $\vec{y}=A^{-1}\left(\vec{f}+\vec{u}\right)$, we obtain
 \begin{flalign*}
-\min\limits_{\underline{u}\in\Omega} \hat{J}(\underline{u}) 
-&=\ \frac{1}{2}\ h^2 ||A^{-1}\left(\underline{f}+\underline{u}\right)-\underline{y_d}||_2^2\ + \frac{\nu}{2}\ h^2 ||\underline{u}||_2^2\\
-& =\ \frac{1}{2}\ h^2 \langle A^{-1}\left(\underline{f}+\underline{u}\right)-\underline{y_d},A^{-1}\left(\underline{f}+\underline{u}\right)-\underline{y_d}\rangle + \frac{\nu}{2}\ h^2 \langle\underline{u},\underline{u}\rangle\\
-& =\ \frac{1}{2}\ h^2  \left(A^{-1}\left(\underline{f}+\underline{u}\right)-\underline{y_d}\right)^{\top} \left(A^{-1}\left(\underline{f}+\underline{u}\right)-\underline{y_d}\right) + \frac{\nu}{2}\ h^2 \underline{u}^{\top}\underline{u}.
+\min\limits_{\vec{u}\in\Omega} \hat{J}(\vec{u}) 
+&=\ \frac{1}{2}\ h^2 ||A^{-1}\left(\vec{f}+\vec{u}\right)-\vec{y}_d||_2^2\ + \frac{\nu}{2}\ h^2 ||\vec{u}||_2^2\\
+& =\ \frac{1}{2}\ h^2 \langle A^{-1}\left(\vec{f}+\vec{u}\right)-\vec{y}_d,A^{-1}\left(\vec{f}+\vec{u}\right)-\vec{y}_d\rangle + \frac{\nu}{2}\ h^2 \langle\vec{u},\vec{u}\rangle\\
+& =\ \frac{1}{2}\ h^2  \left(A^{-1}\left(\vec{f}+\vec{u}\right)-\vec{y}_d\right)^{\top} \left(A^{-1}\left(\vec{f}+\vec{u}\right)-\vec{y}_d\right) + \frac{\nu}{2}\ h^2 \vec{u}^{\top}\vec{u}.
 \end{flalign*}
-As we know that a solution $\underline{u}$ to the problem above has to satisfy $\nabla\hat{J}(\underline{u})=0$, this results in
+As we know that a solution $\vec{u}$ to the problem above has to satisfy $\nabla\hat{J}(\vec{u})=0$, this results in
 \begin{equation*}
-\nabla \hat{J}(\underline{u}) = h^2 A^{-1} \left(A^{-1} (\underline{f}+\underline{u})-\underline{y_d}\right) + \nu h^2\underline{u} = 0.
+\nabla \hat{J}(\vec{u}) = h^2 A^{-1} \left(A^{-1} (\vec{f}+\vec{u})-\vec{y}_d\right) + \nu h^2\vec{u} = 0.
 \end{equation*}
 We can do the following transformations
 \begin{flalign*}
-h^2 A^{-1} \left(A^{-1} (\underline{f}+\underline{u})-\underline{y_d}\right) + \nu h^2\underline{u} &= 0\\
-A^{-1} \left(A^{-1} (\underline{f}+\underline{u})-\underline{y_d}\right) + \nu \underline{u} &=0\\
-A^{-1} A^{-1} (\underline{f}+\underline{u})-A^{-1}\underline{y_d} + \nu \underline{u} &=0\\
-A^{-1} A^{-1} \underline{f}+A^{-1} A^{-1}\underline{u}-A^{-1}\underline{y_d} + \nu \underline{u} &=0\\
-A^{-1} A^{-1} \underline{u} + \nu \underline{u} &=A^{-1}\underline{y_d}-A^{-1} A^{-1}\underline{f}\\
-\left(\nu\text{I}+A^{-1} A^{-1}\right) \underline{u} &=A^{-1}\left(\underline{y_d}-A^{-1}\underline{f}\right)
+h^2 A^{-1} \left(A^{-1} (\vec{f}+\vec{u})-\vec{y}_d\right) + \nu h^2\vec{u} &= 0\\
+A^{-1} \left(A^{-1} (\vec{f}+\vec{u})-\vec{y}_d\right) + \nu \vec{u} &=0\\
+A^{-1} A^{-1} (\vec{f}+\vec{u})-A^{-1}\vec{y}_d + \nu \vec{u} &=0\\
+A^{-1} A^{-1} \vec{f}+A^{-1} A^{-1}\vec{u}-A^{-1}\vec{y}_d + \nu \vec{u} &=0\\
+A^{-1} A^{-1} \vec{u} + \nu \vec{u} &=A^{-1}\vec{y}_d-A^{-1} A^{-1}\vec{f}\\
+\left(\nu\text{I}+A^{-1} A^{-1}\right) \vec{u} &=A^{-1}\left(\vec{y}_d-A^{-1}\vec{f}\right)
 \end{flalign*}
 and derive the optimality system
 \begin{equation}
-\left(\nu\text{I}+A^{-2}\right) \underline{u} =A^{-1}\left(\underline{y_d}-A^{-1}\underline{f}\right) \label{eq:normalOptimalitySystem}
+\left(\nu\text{I}+A^{-2}\right) \vec{u} =A^{-1}\left(\vec{y}_d-A^{-1}\vec{f}\right) \label{eq:normalOptimalitySystem}
 \end{equation}
 or alternatively
 \begin{equation}
-\left(A^2\nu+\text{I}\right) \underline{u} =A\underline{y_d}-\underline{f}. \label{eq:factoredOptimalitySystem}
+\left(A^2\nu+\text{I}\right) \vec{u} =A\vec{y}_d-\vec{f}. \label{eq:factoredOptimalitySystem}
 \end{equation}
 
+
 %% ====================================================================
+
+
 
 \subsection{Laplace Matrices}
 First, we implement a function \texttt{FD\_Laplacian} to create the Finite Difference matrix representation of the Laplace operator in sparse.
@@ -177,7 +186,7 @@ return($u$)
 \subsection{Convergence Analysis}
 Now, we solve the system (\ref{eq:normalOptimalitySystem}) by the stationary iteration
 \begin{equation}
-\underline{u}^{n+1} = -\frac{1}{\nu} A^{-2}\underline{u}^n + \frac{1}{\nu} A^{-1} (\underline{y}_d-A^{-1}\underline{f})
+\vec{u}^{n+1} = -\frac{1}{\nu} A^{-2}\vec{u}^n + \frac{1}{\nu} A^{-1} (\vec{y}_d-A^{-1}\vec{f})
 \end{equation}
 and analyze its convergence behavior for different $m$ and $\nu$.
 \subsubsection{Eigenvectors and eigenvalues of the laplace matrices}
@@ -276,4 +285,3 @@ condition number is getting better and better as $\nu$ increases.
 \subsection{Damped Jacobi as Smoother}
 aoishdjfkljashgkfj
 \end{document}
-
