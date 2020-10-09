@@ -56,10 +56,13 @@
 
 \section{Introduction}
 In the exercises we studied optimal control problems governed by the Laplace equation. We want to solve
-\begin{equation*}
-\min\limits_{\underline{y},\underline{u}\in\Omega} J(\underline{y},\underline{u}) := \frac{1}{2}\ ||\underline{y}-\underline{y_d}||_{L^2(\Omega)}^2 + \frac{\nu}{2}\ ||\underline{u}||_{L^2(\Omega)}^2
-\end{equation*}
-with discretized norm
+\begin{align}
+\min\limits_{\underline{y},\underline{u}\in\Omega} J(\underline{y},\underline{u}) &:= \frac{1}{2}\ ||\underline{y}-\underline{y_d}||_{L^2(\Omega)}^2 + \frac{\nu}{2}\ ||\underline{u}||_{L^2(\Omega)}^2\\
+\text{s.t. } -\Delta y &= f+ u \text{ in } \Omega\\
+y &= 0 \text{ on } \partial\Omega
+\label{eq:OptimalControlProblem}
+\end{align}
+for a regularization parameter $\nu > 0$. We are looking for a control function $u$. With discretized norm
 \begin{equation*}
 ||\underline{x}||_{L^2(\Omega)}^2 := h^2 \sum\limits_{j=1}^n \underline{x}_j^2
 \end{equation*}
@@ -67,7 +70,7 @@ such that
 \begin{equation*}
 A\underline{y}=\underline{f}+\underline{u}
 \end{equation*}
-with $\nu>0$ is satisfied. Notice that we do not have any boundary conditions. One possible way of finding a solution is the so-called reduced approach: We consider $\underline{y}$ as a function of $\underline{u}$, therefore obtaining the problem
+is satisfied. Notice that we do not have any boundary conditions. One possible way of finding a solution is the so-called reduced approach: We consider $\underline{y}$ as a function of $\underline{u}$, therefore obtaining the problem
 \begin{equation*}
 \min\limits_{\underline{u}\in\Omega} \hat{J}(\underline{u}) := J(\underline{y}(\underline{u}),\underline{u}).
 \end{equation*}
@@ -188,12 +191,12 @@ get the following eigenvalues
 \end{align*} 
 and the corresponding eigenvectors with entries
 \begin{align*}
-(\vec{v})_i = \sin\left(\frac{i\cdot \pi k}{m+1} \right), \quad i,k=1,\ldots,m
+(\vec{v}_k)_i = \sin\left(\frac{i\cdot \pi k}{m+1} \right), \quad i,k=1,\ldots,m
 \end{align*}
 Now we can include these manually to get a more exact and especially quicker solver.
 
-To get the eigenvectors and eigenvalues of the two-dimensional laplace matrix, we use problem 10 of REFERENCE TO THE BOOK and proof the third bullet point
-of it. Therefore we use the formula $(A \otimes B)(C \otimes D) = (AC) \otimes (BD)$. For $j,k \in \{1, \ldots, m\}$ arbitrary we get for $\lambda := 
+To get the eigenvectors and eigenvalues of the two-dimensional laplace matrix, we use problem 10 of REFERENCE TO THE BOOK and proof its third bullet 
+point. Therefore we use the formula $(A \otimes B)(C \otimes D) = (AC) \otimes (BD)$. For $j,k \in \{1, \ldots, m\}$ arbitrary we get for $\lambda := 
 \lambda_j + \lambda_k$ and $\vec{v} := \vec{v}_j \otimes \vec{v}_k$ that
 \begin{align*}
 A\vec{v} &= \left(\text{I}_m \otimes T_1 + T_1 \otimes \text{I}_m \right) \vec{v}\\
@@ -254,7 +257,7 @@ gets better the bigger $\nu$ is. Looking at the formulas \eqref{eq:normalOptimal
 really obvious.
 In \eqref{eq:factoredOptimalitySystem} we factor our matrix $A^2$ by $\nu$, so the bigger $\nu$ is, the worse the condition number gets. In the initial 
 system \eqref{eq:normalOptimalitySystem} the identity matrix with factor $\nu$ dominates the diagonal of the left-hand side for bigger $\nu$. So the 
-condition number is getting better and better as $\nu$ is increasing.
+condition number is getting better and better as $\nu$ increases.
 
 
 
