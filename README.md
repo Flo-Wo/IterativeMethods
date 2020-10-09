@@ -1,3 +1,4 @@
+# Project 1: Reduced model approach
 ## Exercises
 
 This file contains multiple solvers for an optimal control problem icluding
