@@ -277,7 +277,7 @@ def condition_number_factored(m, nu):
     return(sol)
     
 
-def solver_stationary(u_guess,nu, y_d, f, m, maxIter=1000, tol=1e-6):
+def solver_stationary(u_guess,nu, y_d, f, m, maxIter=1000, tol=1e-8):
     """
     Function to use a stationary solver for the initial optimality system
     using the iteration process
@@ -300,7 +300,7 @@ def solver_stationary(u_guess,nu, y_d, f, m, maxIter=1000, tol=1e-6):
     maxIter : positive integer, optional
         maximum number of iterations. The default is 1000.
     tol : positive real number, optional
-        tolerance used to compare the residuals to. The default is 1e-6.
+        tolerance used to compare the residuals to. The default is 1e-8.
 
     Returns
     -------
@@ -346,7 +346,43 @@ def solver_stationary(u_guess,nu, y_d, f, m, maxIter=1000, tol=1e-6):
         
     return(u_k, k, res_list)
 
-def solver_stationary_fixedRight(u_guess,nu, right_side, m, maxIter=500, tol=1e-6):
+def solver_stationary_fixedRight(u_guess,nu, right_side, m, maxIter=500, tol=1e-8):
+    """
+    This is a method to use the iteration of the stationary solver for an
+    arbtrary right-hand side of the equation. It is used to solve systems of
+    the form
+    
+        (nu*Id + A^{-2})*u = right_side
+    
+    and used as a smoother for multigrid method (here the right-hand side
+    differs from cycle to cycle).
+
+    Parameters
+    ----------
+    u_guess : ndarray
+        initial guess the algorithm should use to start its iterations
+    nu : positive real number
+        regularization parameter
+    right_side : ndarray
+        right-hand side of the desired equation
+    m : positive integer
+        size of the matrix
+    maxIter : positive integer, optional
+        maximum number of iterations. The default is 500.
+    tol : positive real number, optional
+        tolerance for the algorithm, to compare the residuals to.
+        The default is 1e-8.
+
+    Returns
+    -------
+    u : ndarray
+        solution vector
+    k : integer
+        number of iterations needed
+    res_list : list
+        list with the history of the norm of the residuals
+
+    """
     # get decomposition for fast poisson solver
     lam, V = laplace_small_decomposition(m)
     k = 1
@@ -358,15 +394,15 @@ def solver_stationary_fixedRight(u_guess,nu, right_side, m, maxIter=500, tol=1e-
     #construct linear operator of nu*Id + A^{-2}
     op = get_system(m,nu)
     operator = LinearOperator((m**2,m**2),op)
-    
+    # caclculate the first norm of the residual
     res = np.linalg.norm(operator(u_k) - right_side)
     res_list.append(res)
     
     while res >= tol and k < maxIter:
         temp = fast_poisson(V, V, lam, lam, u_k)
-        
+        # solve current iteration
         u_k = ((-1)*(1/nu) * fast_poisson(V, V, lam, lam, temp))+ 1/nu*right_side
-        
+        # update history of the residuals
         res = np.linalg.norm(operator(u_k) - right_side)
         res_list.append(res)
         
@@ -374,38 +410,58 @@ def solver_stationary_fixedRight(u_guess,nu, right_side, m, maxIter=500, tol=1e-
         
     return(u_k, k, res_list)
 
-def solver_poisson_unfactored_cg(u_guess,nu, y_d, f, m, tol=1e-12, disp=False):
+def solver_poisson_unfactored_cg(u_guess, nu, y_d, f, m, tol=1e-8):
     """
-    Solve the original system:
+    Method to solve the initial optimality system 
     
-    (nu \cdot A^{-2})u = A^{-1} \cdot y_d - A^{-2}\cdot f
+        (nu \cdot A^{-2})u = A^{-1} \cdot y_d - A^{-2}\cdot f
     
-    This system is solved matrix free.
-    """
-    
+    using a matrix free operator and the cg method.
+
+    Parameters
+    ----------
+    u_guess : ndarray
+        inital guess used by cg
+    nu : positive real number
+        regularization parameter
+    y_d : ndarray
+        desired state/function
+    f : ndarray
+        vector/function of the condition in the optimality system
+    m : positive integer
+        size of the matrix/system used
+    tol : positive real number, optional
+        tolerance for the cg algoritm. The default is 1e-8.
+
+    Returns
+    -------
+    u : ndarray
+        solution vector
+    info : integer
+        info whether the algorithm worked properly returned by cg
+        0  : successful exit 
+        >0 : convergence to tolerance not achieved, number of iterations 
+        <0 : illegal input or breakdown
+    num_iters : integer
+        number of iterations needed from cg
+    res : list
+        history with the norm of the residuals
+
+    """    
     #initializing iteration count and residual history
     num_iters = 0
     res = []
     
     # create callback function to get residual history 
-    # and the iteration counter
+    # and the iteration counter from the build in cg-method
     def callback(xk):
         nonlocal num_iters
         num_iters += 1
         frame = inspect.currentframe().f_back
         res.append(frame.f_locals['resid'])
-
-    # create 1D and 2D laplacian matrices
-    #A_small = fd_laplace(m, d=1)
-    #A = fd_laplace(m, d=2)
     
     # get decomposition
-    #lam_2, V_2 = np.linalg.eigh(A_small.toarray())
     lam, V = laplace_small_decomposition(m)
-    
-    # spectral_radius = get_spectralradius(lam, nu)
-    # if disp:
-    #     print("nu = {0}\nspectral radius = {1}\n".format(nu,spectral_radius))
     
     # calculate the right hand side of the system
     right_side_f = fast_poisson(V, V, lam, lam, f) # =A^-1 *f
@@ -419,17 +475,47 @@ def solver_poisson_unfactored_cg(u_guess,nu, y_d, f, m, tol=1e-12, disp=False):
     
     # solve the system using the cg method
     u,info = cg(operator,right_side,x0=u_guess,tol=tol,callback=callback)
-    return(u,info,num_iters,res)
+    return(u, info, num_iters, res)
 
         
-def solver_poisson_factored_cg(u_guess, nu, y_d, f, m,tol=1e-12, disp=False):
+def solver_poisson_factored_cg(u_guess, nu, y_d, f, m,tol=1e-8):
     """
-    Solve the by A^2 factorized system :
-        
-    (\nu * A^2 + \identity) \cdot u = A\cdot y_d - f 
+    Method to solve the factored optimality system 
     
-    This system is solved matrix free.
-    """
+        (\nu * A^2 + \identity) \cdot u = A\cdot y_d - f 
+    
+    using a matrix free operator and the cg method.
+
+    Parameters
+    ----------
+    u_guess : ndarray
+        inital guess used by cg
+    nu : positive real number
+        regularization parameter
+    y_d : ndarray
+        desired state/function
+    f : ndarray
+        vector/function of the condition in the optimality system
+    m : positive integer
+        size of the matrix/system used
+    tol : positive real number, optional
+        tolerance for the cg algoritm. The default is 1e-8.
+
+    Returns
+    -------
+    u : ndarray
+        solution vector
+    info : integer
+        info whether the algorithm worked properly returned by cg
+        0  : successful exit 
+        >0 : convergence to tolerance not achieved, number of iterations 
+        <0 : illegal input or breakdown
+    num_iters : integer
+        number of iterations needed from cg
+    res : list
+        history with the norm of the residuals
+
+    """ 
     #initializing iteration count and residual history
     num_iters = 0
     res = []
@@ -461,21 +547,60 @@ def solver_poisson_factored_cg(u_guess, nu, y_d, f, m,tol=1e-12, disp=False):
     # solve system using cg method
     u,info = cg(left_side_op,right_side,x0=u_guess,tol=tol, callback=callback)
     
-    return(u,info,num_iters,res)
+    return(u, info, num_iters, res)
     
 
 
 def solver_damped_jacobi(A, u_guess, omega, f, maxIter,tol=1e-8):
+    """
+    Function to solve a system 
+    
+        Au = f
+    
+    using the damped jacobi method
+
+    Parameters
+    ----------
+    A : ndarray/sparse matrix
+        matrix of the system
+    u_guess : ndarray
+        inital guess the algorithm should use to start with
+    omega : real number in (0,1)
+        damping parameter for the algorithm
+    f : ndarray
+        right-hand side of the system
+    maxIter : int
+        maximum number of iterations the algorithm should do
+    tol : positive real number, optional
+        tolerance the algorithm should use for the residuals.
+        The default is 1e-8.
+
+    Returns
+    -------
+    u : ndarray
+        solution for the system
+    k : integer
+        number of iterations needed
+    res : list
+        list with the history of the norm of the residuels
+
+    """
+    # get diagonal matrix in csr form, to manipulate its entries
     D_inverse = sparse.diags(1/(A.diagonal()),format="csr")
+    # get size of the matrix
     m,m = D_inverse.shape
     k = 1
+    # init empty history of the norm of the residuals
     res = []
     u_k = u_guess
     resi = (f - A.dot(u_k))
     resi_norm = np.linalg.norm(resi)
+    # get norm of the first residual
     res.append(resi_norm)
     while resi_norm >= tol and k < maxIter:
+        # one step of the damped jacobi 
         u_k = u_k + omega* D_inverse.dot(resi)
+        # calculate the norm of the current residual
         resi = f -  A.dot(u_k)
         resi_norm = np.linalg.norm(resi)
         res.append(resi_norm)
@@ -483,11 +608,45 @@ def solver_damped_jacobi(A, u_guess, omega, f, maxIter,tol=1e-8):
     return(u_k, k, res)
 
 def vcycle_jac(nu, nu1, nu2, m, u_guess, f, level, omega):
+    """
+    Function to run one vcycle of the multigrid method using jacobi as a
+    smoother. In this case we try to solve the initial system.
+
+    Parameters
+    ----------
+    nu : positive real number
+        regularization parameter
+    nu1 : integer
+        number of pre-smoothing steps used
+    nu2 : integer
+        number of post-smoothing steps used
+    m : integer
+        size of the current matrix
+    u_guess : ndarray
+        initial guess of the current run
+    f : ndarray
+        function of the current right-hand side of the system
+    level : int
+        maximum number of levels the algorithm should do in the recursion
+    omega : real number in (0,1)
+        damping parameter for the smoother
+
+    Returns
+    -------
+    u : ndarray
+        solution after the last post-smoothing step
+    res_norm : list
+        list with the norm of the residuals
+
+    """
+    # construct matrix to get the right-hand side of the system
     A = fd_laplace(m, d=2)
     A_2 = np.dot(A,A)
     C = sparse.eye((m**2)) + nu * A_2
+    # save omega for the recursion
     omega_temp = omega
     if level == 1:
+        # on the last level the system gets solved with the build-in solver
         u_sol = sparse.linalg.spsolve(C, f)
         res_norm = np.linalg.norm(f - C.dot(u_sol))
         return(u_sol, res_norm)
@@ -495,19 +654,22 @@ def vcycle_jac(nu, nu1, nu2, m, u_guess, f, level, omega):
         ### PRE-SMOOTHING
         u_nu1,_ ,_ = solver_damped_jacobi(C, u_guess, omega_temp, f, nu1)
         ### RECURSION
+        # restriction matrix (full weighted restriction matrix) to get
+        # the smaller system
         R = RMatrix(m)
+        # projection matrix, to get back to the full system
         P = 2 * R.T
         
         res_temp = f - C.dot(u_nu1)
         
         f_new = R.dot(res_temp)
-        
+        # new size of the smaller system
         m_new = int((m+1)/2 -1)
-        ## !!!! init with zero vector !!!!
+        ## init with zero vector
         u_init = np.zeros(m_new**2)
         
         u_temp, _ = vcycle_jac(nu, nu1, nu2, m_new, u_init, f_new, level-1, omega_temp)
-        
+        # project the current solution into the higher dimensional space
         u_new = u_nu1 + P.dot(u_temp)
         ### POST-SMOOTHING        
         u_nu2,_ ,_ = solver_damped_jacobi(C, u_new, omega, f, nu2)
@@ -515,6 +677,39 @@ def vcycle_jac(nu, nu1, nu2, m, u_guess, f, level, omega):
         return(u_nu2, res_norm)
     
 def multigrid_jacobi(nu, f, u_guess, m, omega, nu1, nu2, level):
+    """
+    Function to run use multigrid as a solver with damped jacobi as a 
+    smoother. In this case we try to solve the initial system.
+
+    Parameters
+    ----------
+    nu : positive real number
+        regularization parameter
+    nu1 : integer
+        number of pre-smoothing steps used
+    nu2 : integer
+        number of post-smoothing steps used
+    m : integer
+        size of the current matrix
+    u_guess : ndarray
+        initial guess of the current run
+    f : ndarray
+        function of the current right-hand side of the system
+    level : int
+        maximum number of levels the algorithm should do in the recursion
+    omega : real number in (0,1)
+        damping parameter for the smoother
+
+    Returns
+    -------
+    u : ndarray
+        solution after the last post-smoothing step
+    res_norm : list
+        list with the norm of the residuals
+    k : int
+        number of iterations neede
+
+    """
     u_sol, res = vcycle_jac(nu, nu1, nu2, m, u_guess, f, level, omega)
     k = 1
     while res >= 1e-6 and k < 1000:
@@ -523,6 +718,35 @@ def multigrid_jacobi(nu, f, u_guess, m, omega, nu1, nu2, level):
     return(u_sol, res, k)
 
 def vcycle_stat(nu, nu1, nu2, m, u_guess, f, level):
+    """
+    Function to run one vcycle of the multigrid method using the stationary 
+    method as a smoother. In this case we try to solve the initial system.
+
+    Parameters
+    ----------
+    nu : positive real number
+        regularization parameter
+    nu1 : integer
+        number of pre-smoothing steps used
+    nu2 : integer
+        number of post-smoothing steps used
+    m : integer
+        size of the current matrix
+    u_guess : ndarray
+        initial guess of the current run
+    f : ndarray
+        function of the current right-hand side of the system
+    level : int
+        maximum number of levels the algorithm should do in the recursion
+
+    Returns
+    -------
+    u : ndarray
+        solution after the last post-smoothing step
+    res_norm : list
+        list with the norm of the residuals
+
+    """
     #construct linear operator
     op = get_system(m,nu)
     C = LinearOperator((m**2,m**2),op)
@@ -540,19 +764,22 @@ def vcycle_stat(nu, nu1, nu2, m, u_guess, f, level):
         
         u_nu1,_ ,_ = solver_stationary_fixedRight(u_guess, nu, f, m, maxIter=nu1)
         ### RECURSION
+        # restriction matrix (full weighted restriction matrix) to get
+        # the smaller system
         R = RMatrix(m)
+        # projection matrix, to get back to the full system
         P = 2 * R.T
         
         res_temp = f - C(u_nu1)
         
         f_new = R.dot(res_temp)
-        
+        # get new matrix size
         m_new = int((m+1)/2 -1)
-        ## !!!! init with zero vector !!!!
+        ## init with zero vector
         u_init = np.zeros(m_new**2)
         
         u_temp, _ = vcycle_stat(nu, nu1, nu2, m_new, u_init, f_new, level-1)
-        
+        # project the current solution into the higher dimensional space
         u_new = u_nu1 + P.dot(u_temp)
         ### POST-SMOOTHING        
         u_nu2,_ ,_ = solver_stationary_fixedRight(u_new, nu, f, m, maxIter=nu2)
@@ -560,6 +787,37 @@ def vcycle_stat(nu, nu1, nu2, m, u_guess, f, level):
         return(u_nu2, res_norm)
     
 def multigrid_stat(nu, f, u_guess, m, nu1, nu2, level):
+    """
+    Function to run use multigrid as a solver with the stationary method as a 
+    smoother. In this case we try to solve the initial system.
+
+    Parameters
+    ----------
+    nu : positive real number
+        regularization parameter
+    nu1 : integer
+        number of pre-smoothing steps used
+    nu2 : integer
+        number of post-smoothing steps used
+    m : integer
+        size of the current matrix
+    u_guess : ndarray
+        initial guess of the current run
+    f : ndarray
+        function of the current right-hand side of the system
+    level : int
+        maximum number of levels the algorithm should do in the recursion
+
+    Returns
+    -------
+    u : ndarray
+        solution after the last post-smoothing step
+    res_norm : list
+        list with the norm of the residuals
+    k : int
+        number of iterations neede
+
+    """
     u_sol, res = vcycle_stat(nu, nu1, nu2, m, u_guess, f, level)
     k = 1
     while res >= 1e-6 and k < 1000:
