@@ -340,13 +340,16 @@ def vcycle_jac(nu, nu1, nu2, m, u_guess, f, level, omega):
         res_norm = np.linalg.norm(f - C.dot(u_nu2))
         return(u_nu2, res_norm)
     
-def multigrid_jacobi(nu, f, u_guess, m, omega, nu1, nu2, level):
+def multigrid_jacobi(nu, f, u_guess, m, omega, nu1, nu2, level,maxIter=1000):
     u_sol, res = vcycle_jac(nu, nu1, nu2, m, u_guess, f, level, omega)
     k = 1
-    while res >= 1e-6 and k < 1000:
+    res_his = []
+    res_his.append(res)
+    while res >= 1e-6 and k < maxIter  and res <= 10e20 :
         u_sol, res = vcycle_jac(nu, nu1, nu2, m, u_sol, f, level, omega)
+        res_his.append(res)
         k+=1
-    return(u_sol, res, k)
+    return(u_sol, res_his, k)
 
 def vcycle_stat(nu, nu1, nu2, m, u_guess, f, level):
     #construct linear operator
@@ -385,13 +388,16 @@ def vcycle_stat(nu, nu1, nu2, m, u_guess, f, level):
         res_norm = np.linalg.norm(f - C(u_nu2))
         return(u_nu2, res_norm)
     
-def multigrid_stat(nu, f, u_guess, m, nu1, nu2, level):
+def multigrid_stat(nu, f, u_guess, m, nu1, nu2, level, maxIter=1000):
     u_sol, res = vcycle_stat(nu, nu1, nu2, m, u_guess, f, level)
     k = 1
-    while res >= 1e-6 and k < 1000:
+    res_his = []
+    res_his.append(res)
+    while res >= 1e-6 and k < maxIter and res <= 10e30 :
         u_sol, res = vcycle_stat(nu, nu1, nu2, m, u_sol, f, level)
         k+=1
-    return(u_sol, res, k)
+        res_his.append(res)
+    return(u_sol, res_his, k)
 
 
 
