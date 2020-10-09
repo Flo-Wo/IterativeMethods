@@ -2,12 +2,12 @@
 ## Exercises
 
 This file contains multiple solvers for an optimal control problem icluding
-    - fast poisson solver framework to fastly calculate the inverse of our
-    matrix system
-    - stationary solver
-    - damped jacobi solver
-    - matrix free krylov method using the conjugated gradient method
-    - multigrid with the stationary method and damped jacobi as smoothers
+
+* fast poisson solver framework to fastly calculate the inverse of our matrix system
+* stationary solver
+* damped jacobi solver
+* matrix free krylov method using the conjugated gradient method
+* multigrid with the stationary method and damped jacobi as smoothers
 
 We wrote this file as a project of the lecture "iterative methods and 
 preconditioning" from Jun.-Prof. Gabriele Ciaramelle, held in the WS2020/2021
