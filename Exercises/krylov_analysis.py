@@ -77,7 +77,7 @@ def plot_conditionNumber():
     plt.tight_layout()
     plt.show()
     
-plot_convergenceRate()
+#plot_convergenceRate()
     
     
     

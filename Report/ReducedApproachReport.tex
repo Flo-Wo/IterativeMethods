@@ -58,16 +58,16 @@
 \section{Introduction}
 In the exercises we studied optimal control problems governed by the Laplace equation. We want to solve
 \begin{align}
-\min\limits_{\vec{y},\vec{u}\in\Omega} J(\vec{y},\vec{u}) &:= \frac{1}{2}\ \norm{\vec{y}-\vec{y}_d}
-_{L^2(\Omega)}^2 + \frac{\nu}{2}\ \norm{\vec{u}}_{L^2(\Omega)}^2\\
+\min\limits_{y,u\in L^2(\Omega)} J(y,u) &:= \frac{1}{2}\ \norm{y-y_d}
+_{L^2(\Omega)}^2 + \frac{\nu}{2}\ \norm{u}_{L^2(\Omega)}^2\\
 \text{s.t. } -\Delta y &= f+ u \text{ in } \Omega\\
 y &= 0 \text{ on } \partial\Omega
 \end{align}
 for a regularization parameter $\nu > 0$. We are looking for a control function $u$. With discretized norm
 \begin{equation*}
-||\vec{x}||_{L^2(\Omega)}^2 := h^2 \sum\limits_{j=1}^n \vec{x}_j^2
+\norm{\vec{x}}_{L_h^2(\Omega)}^2 := h^2 \sum\limits_{j=1}^n \vec{x}_j^2
 \end{equation*}
-such that
+for $h>0$ small enough, such that
 \begin{equation*}
 A\vec{y}=\vec{f}+\vec{u}
 \end{equation*}
@@ -87,12 +87,12 @@ is satisfied. Notice that we do not have any boundary conditions. One possible w
 \subsection{Deriving the Optimality System}
 We see that
 \begin{equation*}
-||\vec{x}||_{L^2(\Omega)}^2 = h^2\ ||\vec{x}||_2^2
+\norm{\vec{x}}_{L_h^2(\Omega)}^2 = h^2\ \norm{\vec{x}}_2^2
 \end{equation*}
 holds for arbitrary $x$. In combination with $\vec{y}=A^{-1}\left(\vec{f}+\vec{u}\right)$, we obtain
 \begin{flalign*}
 \min\limits_{\vec{u}\in\Omega} \hat{J}(\vec{u}) 
-&=\ \frac{1}{2}\ h^2 ||A^{-1}\left(\vec{f}+\vec{u}\right)-\vec{y}_d||_2^2\ + \frac{\nu}{2}\ h^2 ||\vec{u}||_2^2\\
+&=\ \frac{1}{2}\ h^2 \norm{A^{-1}\left(\vec{f}+\vec{u}\right)-\vec{y}_d}_2^2\ + \frac{\nu}{2}\ h^2 \norm{\vec{u}}_2^2\\
 & =\ \frac{1}{2}\ h^2 \langle A^{-1}\left(\vec{f}+\vec{u}\right)-\vec{y}_d,A^{-1}\left(\vec{f}+\vec{u}\right)-\vec{y}_d\rangle + \frac{\nu}{2}\ h^2 \langle\vec{u},\vec{u}\rangle\\
 & =\ \frac{1}{2}\ h^2  \left(A^{-1}\left(\vec{f}+\vec{u}\right)-\vec{y}_d\right)^{\top} \left(A^{-1}\left(\vec{f}+\vec{u}\right)-\vec{y}_d\right) + \frac{\nu}{2}\ h^2 \vec{u}^{\top}\vec{u}.
 \end{flalign*}
