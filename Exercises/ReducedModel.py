@@ -72,7 +72,7 @@ def get_system(m,nu):
     #A = fd_laplace(m,d=2)
     A_small = fd_laplace(m,d=1)
     eye_nu = nu*sparse.identity(m**2)
-    lam, V = np.linalg.eigh(A_small.toarray())
+    lam, V = laplace_small_decomposition(m)
     def left_side(v):
         sol = fast_poisson(V,V,lam,lam,v)
         sol2 = fast_poisson(V,V,lam,lam,sol)
@@ -341,9 +341,13 @@ def vcycle_jac(nu, nu1, nu2, m, u_guess, f, level, omega):
         return(u_nu2, res_norm)
     
 def multigrid_jacobi(nu, f, u_guess, m, omega, nu1, nu2, level,maxIter=1000):
-    u_sol, res = vcycle_jac(nu, nu1, nu2, m, u_guess, f, level, omega)
-    k = 1
+    k=1
+    A = fd_laplace(m, d=2)
+    A_2 = np.dot(A,A)
+    C = sparse.eye((m**2)) + nu * A_2
+    u_sol=u_guess
     res_his = []
+    res =np.linalg.norm( f - C.dot(u_sol)) 
     res_his.append(res)
     while res >= 1e-6 and k < maxIter  and res <= 10e20 :
         u_sol, res = vcycle_jac(nu, nu1, nu2, m, u_sol, f, level, omega)
@@ -389,7 +393,11 @@ def vcycle_stat(nu, nu1, nu2, m, u_guess, f, level):
         return(u_nu2, res_norm)
     
 def multigrid_stat(nu, f, u_guess, m, nu1, nu2, level, maxIter=1000):
-    u_sol, res = vcycle_stat(nu, nu1, nu2, m, u_guess, f, level)
+    
+    u_sol=u_guess
+    op = get_system(m,nu)
+    C = LinearOperator((m**2,m**2),op)
+    res  = np.linalg.norm(f - C(u_sol))
     k = 1
     res_his = []
     res_his.append(res)
