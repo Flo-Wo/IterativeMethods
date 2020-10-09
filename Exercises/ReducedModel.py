@@ -28,7 +28,7 @@ This file contains multiple solvers for an optimal control problem including
     - multigrid with the stationary method and damped jacobi as smoothers
 
 We wrote this file as a project of the lecture "iterative methods and 
-preconditioning" from Jun.-Prof. Gabriele Ciaramelle, held in the WS2020/2021
+preconditioning" from Jun.-Prof. Gabriele Ciaramella, held in the WS2020/2021
 at the University of Konstanz.
 
 The other according files contain multiple tests and functions to plot
