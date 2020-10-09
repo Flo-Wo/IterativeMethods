@@ -19,7 +19,7 @@ plt.close('all')
 Authors: Florian Wolf, Michael Thiele, Thanh-Van Huynh
 Date: 09.10.2020
 
-This file contains multiple solvers for an optimal control problem icluding
+This file contains multiple solvers for an optimal control problem including
     - fast poisson solver framework to fastly calculate the inverse of our
     matrix system
     - stationary solver

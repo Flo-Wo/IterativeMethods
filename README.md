@@ -1,7 +1,7 @@
 # Project 1: Reduced model approach
 ## Exercises
 
-This file contains multiple solvers for an optimal control problem icluding
+This file contains multiple solvers for an optimal control problem including
 
 * fast poisson solver framework to fastly calculate the inverse of our matrix system
 * stationary solver
