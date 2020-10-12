@@ -675,8 +675,13 @@ def vcycle_jac(nu, nu1, nu2, m, u_guess, f, level, omega):
         u_nu2,_ ,_ = solver_damped_jacobi(C, u_new, omega, f, nu2)
         res_norm = np.linalg.norm(f - C.dot(u_nu2))
         return(u_nu2, res_norm)
+<<<<<<< HEAD
     
 def multigrid_jacobi(nu, f, u_guess, m, omega, nu1, nu2, level):
+=======
+
+def multigrid_jacobi(nu, f, u_guess, m, omega, nu1, nu2, level,maxIter=1000, tol=1e-6):
+>>>>>>> 0c3eb15a860ad94273aae4de8baba0d94e98f8c2
     """
     Function to run use multigrid as a solver with damped jacobi as a 
     smoother. In this case we try to solve the initial system.
@@ -710,12 +715,25 @@ def multigrid_jacobi(nu, f, u_guess, m, omega, nu1, nu2, level):
         number of iterations neede
 
     """
+<<<<<<< HEAD
     u_sol, res = vcycle_jac(nu, nu1, nu2, m, u_guess, f, level, omega)
     k = 1
     while res >= 1e-6 and k < 1000:
+=======
+    k=1
+    A = fd_laplace(m, d=2)
+    A_2 = np.dot(A,A)
+    C = sparse.eye((m**2)) + nu * A_2
+    u_sol=u_guess
+    res_his = []
+    res =np.linalg.norm( f - C.dot(u_sol)) 
+    res_his.append(res)
+    while res >= tol and k < maxIter  and res <= 10e20 :
+>>>>>>> 0c3eb15a860ad94273aae4de8baba0d94e98f8c2
         u_sol, res = vcycle_jac(nu, nu1, nu2, m, u_sol, f, level, omega)
+        res_his.append(res)
         k+=1
-    return(u_sol, res, k)
+    return(u_sol, res_his, k)
 
 def vcycle_stat(nu, nu1, nu2, m, u_guess, f, level):
     """
@@ -785,8 +803,14 @@ def vcycle_stat(nu, nu1, nu2, m, u_guess, f, level):
         u_nu2,_ ,_ = solver_stationary_fixedRight(u_new, nu, f, m, maxIter=nu2)
         res_norm = np.linalg.norm(f - C(u_nu2))
         return(u_nu2, res_norm)
+<<<<<<< HEAD
     
 def multigrid_stat(nu, f, u_guess, m, nu1, nu2, level):
+=======
+
+
+def multigrid_stat(nu, f, u_guess, m, nu1, nu2, level, maxIter=1000,tol=1e-6):
+>>>>>>> 0c3eb15a860ad94273aae4de8baba0d94e98f8c2
     """
     Function to run use multigrid as a solver with the stationary method as a 
     smoother. In this case we try to solve the initial system.
@@ -818,9 +842,24 @@ def multigrid_stat(nu, f, u_guess, m, nu1, nu2, level):
         number of iterations neede
 
     """
+<<<<<<< HEAD
     u_sol, res = vcycle_stat(nu, nu1, nu2, m, u_guess, f, level)
+=======
+    u_sol=u_guess
+    op = get_system(m,nu)
+    C = LinearOperator((m**2,m**2),op)
+    res  = np.linalg.norm(f - C(u_sol))
+>>>>>>> 0c3eb15a860ad94273aae4de8baba0d94e98f8c2
     k = 1
-    while res >= 1e-6 and k < 1000:
+    res_his = []
+    res_his.append(res)
+    while res >= tol and k < maxIter and res <= 10e30 :
         u_sol, res = vcycle_stat(nu, nu1, nu2, m, u_sol, f, level)
         k+=1
+<<<<<<< HEAD
     return(u_sol, res, k)
+=======
+        res_his.append(res)
+    return(u_sol, res_his, k)
+
+>>>>>>> 0c3eb15a860ad94273aae4de8baba0d94e98f8c2
