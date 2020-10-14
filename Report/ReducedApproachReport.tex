@@ -220,7 +220,6 @@ about Krylov methods.
 %% ====================================================================
 
 \subsection{Damped Jacobi}
-\label{sec:DampedJacobi}
 
 %% ====================================================================
 \newpage
@@ -268,7 +267,6 @@ really obvious.
 In \eqref{eq:factoredOptimalitySystem} we factor our matrix $A^2$ by $\nu$, so the bigger $\nu$ is, the worse the condition number gets. In the initial 
 system \eqref{eq:normalOptimalitySystem} the identity matrix with factor $\nu$ dominates the diagonal of the left-hand side for bigger $\nu$. So the 
 condition number is getting better and better as $\nu$ increases.
-
 %% ====================================================================
 
 \section{Multigrid}
@@ -291,10 +289,10 @@ First we analyse \eqref{eq: stationaryMethod} and it's corresponding multigrid m
 
 
 \begin{figure}[h!]
-\centering
-\includegraphics[scale=0.4]{./imgs/multigrid_stat_comparison_tiny}
-\caption{Number of iterations of multigrid in comparison with the stationary method for different $\nu$ and $m$}
-\label{fig: multigridStationary}
+	\centering
+	\includegraphics[scale=0.4]{./imgs/multigrid_stat_comparison_tiny}
+	\caption{Number of iterations of multigrid in comparison with the stationary method for different $\nu$ and $m$}
+	\label{fig: multigridStationary}
 \end{figure}
 Now let us check, if our predictions were right. From figure \ref{fig: multigridStationary} we can observe, that our multigrid method converges only for huge $\nu $. This can be explained by the fact, that our sationary method converges only for huge $\nu$. In this case the term $\nu \Id$ dominates $\nu \Id + A^{-2}$ and we get a iteration which would be similar to a jacobi one. As bigger $m$ gets, $\nu$ needs to grow faster to achieve this effect. Therefore our multigrid method is not independent of the size $m$, because our stationary method can stop converging for $m$ rising. Though provided that our multigrid method converges, it needs only a few iterations. In this case our method is extremly quick  
 
@@ -318,7 +316,7 @@ That's why Jacobi should still produces reasonable results.
 
 Again let's verify our predictions. In figure \ref{fig: multigridJacobi} we can see exactly, what we expected. Our method is great for solving problems with small $\nu$. Though for very small $\nu$ we come close to:
 \[
-  \Id   \vec{v} = \vec{f}
+\Id   \vec{v} = \vec{f}
 \] 
 and the solution isn't so meaningful.
 Moreover we can see, that the multigrid method converges slower for $\nu$ rising. So thats again, what we predicted. From figure \ref*{fig: multigridJacobi} we really see, that our multigrid method is independent of the size $m$. We are able to observe this phenomenon in nearly every row. 
