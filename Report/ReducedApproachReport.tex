@@ -31,20 +31,21 @@
 \usepackage{graphicx}
 \usepackage[left=2cm,right=2cm,top=2.6cm,bottom=1.4cm,includefoot]{geometry}
 \usepackage{hyperref}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
 
 
 \begin{document}
 
 \title{Iterative Methods}
 
-%    author information
+%author information
 \author{Thanh-Van Huynh, Michael Thiele, Florian Wolf}
 \email{thanh-van.huynh@uni-konstanz.de, michael.thiele@uni-konstanz.de, florian.2.wolf@uni-konstanz.de}
 
 %\dedicatory{Thanks Gabriele and Christian for your great work.}
 
 \begin{abstract}
-	This is a report about the findings of Thanh-Van Huynh, Michael Thiele and Florian Wolf in the exercises accompanying Iterative Methods for Linear Systems. The lecture was held by Jun.-Prof. Dr. Gabriele Ciaramella with the assistance of Christian J\"ackle in the winter term 2020/21 at the University of Constance.
+This is a report about the findings of Thanh-Van Huynh, Michael Thiele and Florian Wolf in the exercises accompanying Iterative Methods for Linear Systems. The lecture was held by Jun.-Prof. Dr. Gabriele Ciaramella with the assistance of Christian J\"ackle in the winter term 2020/21 at the University of Constance.
 \end{abstract}
 
 \maketitle
@@ -56,21 +57,29 @@
 
 \section{Introduction}
 In the exercises we studied optimal control problems governed by the Laplace equation. We want to solve
+\begin{align}
+\min\limits_{y,u\in L^2(\Omega)} J(y,u) &:= \frac{1}{2}\ \norm{y-y_d}
+_{L^2(\Omega)}^2 + \frac{\nu}{2}\ \norm{u}_{L^2(\Omega)}^2\\
+\text{s.t. } -\Delta y &= f+ u \text{ in } \Omega\\
+y &= 0 \text{ on } \partial\Omega
+\end{align}
+for a regularization parameter $\nu > 0$. We are looking for a control function $u$. With discretized norm
 \begin{equation*}
-\min\limits_{\underline{y},\underline{u}\in\Omega} J(\underline{y},\underline{u}) := \frac{1}{2}\ ||\underline{y}-\underline{y_d}||_{L^2(\Omega)}^2 + \frac{\nu}{2}\ ||\underline{u}||_{L^2(\Omega)}^2
+\norm{\vec{x}}_{L_h^2(\Omega)}^2 := h^2 \sum\limits_{j=1}^n \vec{x}_j^2
 \end{equation*}
-with discretized norm
+for $h>0$ small enough, such that
 \begin{equation*}
-||\underline{x}||_{L^2(\Omega)}^2 := h^2 \sum\limits_{j=1}^n \underline{x}_j^2
+A\vec{y}=\vec{f}+\vec{u}
 \end{equation*}
-such that
+is satisfied. Notice that we do not have any boundary conditions. One possible way of finding a solution is the so-called reduced approach: We consider $\vec{y}$ as a function of $\vec{u}$, therefore obtaining the problem
 \begin{equation*}
-A\underline{y}=\underline{f}+\underline{u}
+\min\limits_{\vec{u}\in\Omega} \hat{J}(\vec{u}) := J(\vec{y}(\vec{u}),\vec{u}).
 \end{equation*}
-with $\nu>0$ is satisfied. Notice that we do not have any boundary conditions. One possible way of finding a solution is the so-called reduced approach: We consider $\underline{y}$ as a function of $\underline{u}$, therefore obtaining the problem
-\begin{equation*}
-\min\limits_{\underline{u}\in\Omega} \hat{J}(\underline{u}) := J(\underline{y}(\underline{u}),\underline{u}).
-\end{equation*}
+
+
+%% ====================================================================
+%% ====================================================================
+%% ====================================================================
 
 %% ====================================================================
 
@@ -78,38 +87,41 @@ with $\nu>0$ is satisfied. Notice that we do not have any boundary conditions. O
 \subsection{Deriving the Optimality System}
 We see that
 \begin{equation*}
-||\underline{x}||_{L^2(\Omega)}^2 = h^2\ ||\underline{x}||_2^2
+\norm{\vec{x}}_{L_h^2(\Omega)}^2 = h^2\ \norm{\vec{x}}_2^2
 \end{equation*}
-holds for arbitrary $x$. In combination with $\underline{y}=A^{-1}\left(\underline{f}+\underline{u}\right)$, we obtain
+holds for arbitrary $x$. In combination with $\vec{y}=A^{-1}\left(\vec{f}+\vec{u}\right)$, we obtain
 \begin{flalign*}
-\min\limits_{\underline{u}\in\Omega} \hat{J}(\underline{u}) 
-&=\ \frac{1}{2}\ h^2 ||A^{-1}\left(\underline{f}+\underline{u}\right)-\underline{y_d}||_2^2\ + \frac{\nu}{2}\ h^2 ||\underline{u}||_2^2\\
-& =\ \frac{1}{2}\ h^2 \langle A^{-1}\left(\underline{f}+\underline{u}\right)-\underline{y_d},A^{-1}\left(\underline{f}+\underline{u}\right)-\underline{y_d}\rangle + \frac{\nu}{2}\ h^2 \langle\underline{u},\underline{u}\rangle\\
-& =\ \frac{1}{2}\ h^2  \left(A^{-1}\left(\underline{f}+\underline{u}\right)-\underline{y_d}\right)^{\top} \left(A^{-1}\left(\underline{f}+\underline{u}\right)-\underline{y_d}\right) + \frac{\nu}{2}\ h^2 \underline{u}^{\top}\underline{u}.
+\min\limits_{\vec{u}\in\Omega} \hat{J}(\vec{u}) 
+&=\ \frac{1}{2}\ h^2 \norm{A^{-1}\left(\vec{f}+\vec{u}\right)-\vec{y}_d}_2^2\ + \frac{\nu}{2}\ h^2 \norm{\vec{u}}_2^2\\
+& =\ \frac{1}{2}\ h^2 \langle A^{-1}\left(\vec{f}+\vec{u}\right)-\vec{y}_d,A^{-1}\left(\vec{f}+\vec{u}\right)-\vec{y}_d\rangle + \frac{\nu}{2}\ h^2 \langle\vec{u},\vec{u}\rangle\\
+& =\ \frac{1}{2}\ h^2  \left(A^{-1}\left(\vec{f}+\vec{u}\right)-\vec{y}_d\right)^{\top} \left(A^{-1}\left(\vec{f}+\vec{u}\right)-\vec{y}_d\right) + \frac{\nu}{2}\ h^2 \vec{u}^{\top}\vec{u}.
 \end{flalign*}
-As we know that a solution $\underline{u}$ to the problem above has to satisfy $\nabla\hat{J}(\underline{u})=0$, this results in
+As we know that a solution $\vec{u}$ to the problem above has to satisfy $\nabla\hat{J}(\vec{u})=0$, this results in
 \begin{equation*}
-\nabla \hat{J}(\underline{u}) = h^2 A^{-1} \left(A^{-1} (\underline{f}+\underline{u})-\underline{y_d}\right) + \nu h^2\underline{u} = 0.
+\nabla \hat{J}(\vec{u}) = h^2 A^{-1} \left(A^{-1} (\vec{f}+\vec{u})-\vec{y}_d\right) + \nu h^2\vec{u} = 0.
 \end{equation*}
 We can do the following transformations
 \begin{flalign*}
-h^2 A^{-1} \left(A^{-1} (\underline{f}+\underline{u})-\underline{y_d}\right) + \nu h^2\underline{u} &= 0\\
-A^{-1} \left(A^{-1} (\underline{f}+\underline{u})-\underline{y_d}\right) + \nu \underline{u} &=0\\
-A^{-1} A^{-1} (\underline{f}+\underline{u})-A^{-1}\underline{y_d} + \nu \underline{u} &=0\\
-A^{-1} A^{-1} \underline{f}+A^{-1} A^{-1}\underline{u}-A^{-1}\underline{y_d} + \nu \underline{u} &=0\\
-A^{-1} A^{-1} \underline{u} + \nu \underline{u} &=A^{-1}\underline{y_d}-A^{-1} A^{-1}\underline{f}\\
-\left(\nu\text{I}+A^{-1} A^{-1}\right) \underline{u} &=A^{-1}\left(\underline{y_d}-A^{-1}\underline{f}\right)
+h^2 A^{-1} \left(A^{-1} (\vec{f}+\vec{u})-\vec{y}_d\right) + \nu h^2\vec{u} &= 0\\
+A^{-1} \left(A^{-1} (\vec{f}+\vec{u})-\vec{y}_d\right) + \nu \vec{u} &=0\\
+A^{-1} A^{-1} (\vec{f}+\vec{u})-A^{-1}\vec{y}_d + \nu \vec{u} &=0\\
+A^{-1} A^{-1} \vec{f}+A^{-1} A^{-1}\vec{u}-A^{-1}\vec{y}_d + \nu \vec{u} &=0\\
+A^{-1} A^{-1} \vec{u} + \nu \vec{u} &=A^{-1}\vec{y}_d-A^{-1} A^{-1}\vec{f}\\
+\left(\nu\text{I}+A^{-1} A^{-1}\right) \vec{u} &=A^{-1}\left(\vec{y}_d-A^{-1}\vec{f}\right)
 \end{flalign*}
 and derive the optimality system
 \begin{equation}
-\left(\nu\text{I}+A^{-2}\right) \underline{u} =A^{-1}\left(\underline{y_d}-A^{-1}\underline{f}\right) \label{eq:normalOptimalitySystem}
+\left(\nu\text{I}+A^{-2}\right) \vec{u} =A^{-1}\left(\vec{y}_d-A^{-1}\vec{f}\right) \label{eq:normalOptimalitySystem}
 \end{equation}
 or alternatively
 \begin{equation}
-\left(A^2\nu+\text{I}\right) \underline{u} =A\underline{y_d}-\underline{f}. \label{eq:factoredOptimalitySystem}
+\left(A^2\nu+\text{I}\right) \vec{u} =A\vec{y}_d-\vec{f}. \label{eq:factoredOptimalitySystem}
 \end{equation}
 
+
 %% ====================================================================
+
+
 
 \subsection{Laplace Matrices}
 First, we implement a function \texttt{FD\_Laplacian} to create the Finite Difference matrix representation of the Laplace operator in sparse.
@@ -174,7 +186,7 @@ return($u$)
 \subsection{Convergence Analysis}
 Now, we solve the system (\ref{eq:normalOptimalitySystem}) by the stationary iteration
 \begin{equation}
-\underline{u}^{n+1} = -\frac{1}{\nu} A^{-2}\underline{u}^n + \frac{1}{\nu} A^{-1} (\underline{y}_d-A^{-1}\underline{f})
+\vec{u}^{n+1} = -\frac{1}{\nu} A^{-2}\vec{u}^n + \frac{1}{\nu} A^{-1} (\vec{y}_d-A^{-1}\vec{f})
 \end{equation}
 and analyze its convergence behavior for different $m$ and $\nu$.
 \subsubsection{Eigenvectors and eigenvalues of the laplace matrices}
@@ -188,12 +200,12 @@ get the following eigenvalues
 \end{align*} 
 and the corresponding eigenvectors with entries
 \begin{align*}
-(\vec{v})_i = \sin\left(\frac{i\cdot \pi k}{m+1} \right), \quad i,k=1,\ldots,m
+(\vec{v}_k)_i = \sin\left(\frac{i\cdot \pi k}{m+1} \right), \quad i,k=1,\ldots,m
 \end{align*}
 Now we can include these manually to get a more exact and especially quicker solver.
 
-To get the eigenvectors and eigenvalues of the two-dimensional laplace matrix, we use problem 10 of REFERENCE TO THE BOOK and proof the third bullet point
-of it. Therefore we use the formula $(A \otimes B)(C \otimes D) = (AC) \otimes (BD)$. For $j,k \in \{1, \ldots, m\}$ arbitrary we get for $\lambda := 
+To get the eigenvectors and eigenvalues of the two-dimensional laplace matrix, we use problem 10 of REFERENCE TO THE BOOK and proof its third bullet 
+point. Therefore we use the formula $(A \otimes B)(C \otimes D) = (AC) \otimes (BD)$. For $j,k \in \{1, \ldots, m\}$ arbitrary we get for $\lambda := 
 \lambda_j + \lambda_k$ and $\vec{v} := \vec{v}_j \otimes \vec{v}_k$ that
 \begin{align*}
 A\vec{v} &= \left(\text{I}_m \otimes T_1 + T_1 \otimes \text{I}_m \right) \vec{v}\\
@@ -208,6 +220,7 @@ about Krylov methods.
 %% ====================================================================
 
 \subsection{Damped Jacobi}
+\label{sec:DampedJacobi}
 
 %% ====================================================================
 \newpage
@@ -254,11 +267,7 @@ gets better the bigger $\nu$ is. Looking at the formulas \eqref{eq:normalOptimal
 really obvious.
 In \eqref{eq:factoredOptimalitySystem} we factor our matrix $A^2$ by $\nu$, so the bigger $\nu$ is, the worse the condition number gets. In the initial 
 system \eqref{eq:normalOptimalitySystem} the identity matrix with factor $\nu$ dominates the diagonal of the left-hand side for bigger $\nu$. So the 
-condition number is getting better and better as $\nu$ is increasing.
-
-
-
-
+condition number is getting better and better as $\nu$ increases.
 
 %% ====================================================================
 
@@ -266,11 +275,51 @@ condition number is getting better and better as $\nu$ is increasing.
 
 %% ====================================================================
 
+In our last section we use multigrid methods to solve our problems \eqref{eq:normalOptimalitySystem} and \ref{eq:factoredOptimalitySystem}. These problems can be derived by discretization, as shown in the introduction. So we are able to apply multigrid methods. We have already seen two stationary methods:
+\begin{equation}
+\vec{u}^{n+1}    = - \frac{1}{\nu} A^{-2} \vec{u}^n+ \vec{f}
+\label{eq: stationaryMethod}
+\end{equation}
+and 
+\begin{equation}
+\vec{u}^{n+1}    =  \vec{u}^n+ \omega D^{-1}  (\vec{f} - (\nu \Id + A^2) \vec{u}^n)
+\label{eq: dampedJacobi}
+\end{equation}
+In the following we will refer to \eqref{eq: stationaryMethod} as the stationary method, in order to distinguish this method from \eqref{eq: dampedJacobi} which is called damped Jacobi method with damping parameter $\omega \in (0,1] $. We used \eqref{eq: stationaryMethod} to solve  \eqref{eq:normalOptimalitySystem} and \eqref{eq: dampedJacobi} to solve \eqref{eq:factoredOptimalitySystem}. Now we want to apply \eqref{eq: stationaryMethod} and \eqref{eq: dampedJacobi} as smoother in a multigrid methods. In both multigrid methods we use the interpolation matrix $P$ and the full weighting restriction matrix $R:= \frac{1}{2} P^T$  in our coarse correction step. Furthermore we do 2 Pre-Smoothing and 2 Post-Smoothing steps. 
 \subsection{Stationary Method as Smoother}
+First we analyse \eqref{eq: stationaryMethod} and it's corresponding multigrid method. We expect that the convergence of our multigrid methods gets better for rising $\nu$. Because regarding the notation of the script $M^{-1} N = - \frac{1}{\nu} A^{-2} $ is the iteration matrix of the stationary method. Therefore our stationary method converges faster for $\nu $ rising, which is shown in \ref{sec:DampedJacobi}. For smaller $\nu$ we can expect slower or not even convergence at all, if the stationary method does not converge. 
+
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.4]{./imgs/multigrid_stat_comparison_tiny}
+\caption{Number of iterations of multigrid in comparison with the stationary method for different $\nu$ and $m$}
+\label{fig: multigridStationary}
+\end{figure}
+Now let us check, if our predictions were right. From figure \ref{fig: multigridStationary} we can observe, that our multigrid method converges only for huge $\nu $. This can be explained by the fact, that our sationary method converges only for huge $\nu$. In this case the term $\nu \Id$ dominates $\nu \Id + A^{-2}$ and we get a iteration which would be similar to a jacobi one. As bigger $m$ gets, $\nu$ needs to grow faster to achieve this effect. Therefore our multigrid method is not independent of the size $m$, because our stationary method can stop converging for $m$ rising. Though provided that our multigrid method converges, it needs only a few iterations. In this case our method is extremly quick  
+
 
 %% ====================================================================
 
 \subsection{Damped Jacobi as Smoother}
-aoishdjfkljashgkfj
-\end{document}
+Now we want to analyse the multigrid method with damped jacobi as smoother. We set $\omega= 0.5$, so we go half the way of every step. Let's make some predictions what happens, if we run our multigrid method. First we expect, that the multigrid method will be faster for shrinking $\nu$ and slower for bigger $\nu$. Because of $I + \nu A^2$ is diagonal dominant for small $\nu$, and Jacobi converges for such systems. For rising $\nu$, we'll lose this effect. Nevertheless, $A^2$ is block tridiagonal:
+\begin{align*}
+A^2\\
+= (I \otimes T + T \otimes I)^2 \\
+= 2  \cdot T \otimes T + T^2 \otimes \Id + \Id \otimes T^2 
+\end{align*}
+That's why Jacobi should still produces reasonable results. 
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=0.4]{./imgs/multigrid_jac_comparison_tiny}
+	\caption{Number of iterations of multigrid in comparison with damped jacobi for different $\nu$ and $m$}
+	\label{fig: multigridJacobi}
+\end{figure}
 
+Again let's verify our predictions. In figure \ref{fig: multigridJacobi} we can see exactly, what we expected. Our method is great for solving problems with small $\nu$. Though for very small $\nu$ we come close to:
+\[
+  \Id   \vec{v} = \vec{f}
+\] 
+and the solution isn't so meaningful.
+Moreover we can see, that the multigrid method converges slower for $\nu$ rising. So thats again, what we predicted. From figure \ref*{fig: multigridJacobi} we really see, that our multigrid method is independent of the size $m$. We are able to observe this phenomenon in nearly every row. 
+\end{document}
