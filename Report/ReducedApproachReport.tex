@@ -287,7 +287,7 @@ and
 \label{eq: dampedJacobi}
 \end{equation}
 In the following we will refer to \eqref{eq: stationaryMethod} as the stationary method, in order to distinguish this method from \eqref{eq: dampedJacobi}, which is called damped Jacobi method with damping parameter $\omega \in (0,1] $. We used \eqref{eq: stationaryMethod} to solve  \eqref{eq:normalOptimalitySystem} and \eqref{eq: dampedJacobi} to solve \eqref{eq:factoredOptimalitySystem}. Now we want to apply \eqref{eq: stationaryMethod} and \eqref{eq: dampedJacobi} as smoothers in a multigrid method. In both multigrid methods we use the interpolation matrix $P$ and the full weighting restriction matrix $R:= \frac{1}{2} P^T$  in our coarse correction step. Furthermore we do 2 Pre-Smoothing and 2 Post-Smoothing steps. 
-\subsection{Stationary Method as Smoother}
+\subsection{Stationary Methods as Smoother}
 First we analyse \eqref{eq: stationaryMethod} and it's corresponding multigrid method. We expect that the convergence of our multigrid methods gets better for rising $\nu$. Regarding the notation of the script $M^{-1} N = - \frac{1}{\nu} A^{-2} $ is the iteration matrix of the stationary method. Therefore our stationary method converges faster for $\nu $ rising, which is shown in \ref{sec:DampedJacobi}. For smaller $\nu$ we can expect slower or not even convergence at all, if the stationary method does not converge. 
 
 

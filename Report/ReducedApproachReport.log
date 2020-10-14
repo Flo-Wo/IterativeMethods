@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2016.4.23)  14 OCT 2020 17:07
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2016.4.23)  14 OCT 2020 17:09
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -436,7 +436,7 @@ File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
 (Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 154.
  [2] [3]
-<./imgs/CG_analysis.png, id=127, 1387.584pt x 652.5981pt>
+<./imgs/CG_analysis.png, id=96, 1387.584pt x 652.5981pt>
 File: ./imgs/CG_analysis.png Graphic file (type png)
 
 <use ./imgs/CG_analysis.png>
@@ -447,7 +447,7 @@ Overfull \hbox (221.06384pt too wide) in paragraph at lines 242--244
  [][] 
  []
 
-<./imgs/CG_conditionNumber.png, id=130, 693.0693pt x 241.3818pt>
+<./imgs/CG_conditionNumber.png, id=99, 693.0693pt x 241.3818pt>
 File: ./imgs/CG_conditionNumber.png Graphic file (type png)
 
 <use ./imgs/CG_conditionNumber.png>
@@ -458,7 +458,7 @@ Package pdftex.def Info: ./imgs/CG_conditionNumber.png used on input line 258.
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
 [4 <./imgs/CG_analysis.png>]
-<./imgs/multigrid_stat_comparison_tiny.png, id=155, 900.36375pt x 866.23625pt>
+<./imgs/multigrid_stat_comparison_tiny.png, id=126, 900.36375pt x 866.23625pt>
 File: ./imgs/multigrid_stat_comparison_tiny.png Graphic file (type png)
 
 <use ./imgs/multigrid_stat_comparison_tiny.png>
@@ -469,7 +469,7 @@ t line 296.
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-<./imgs/multigrid_jac_comparison_tiny.png, id=157, 906.38625pt x 866.23625pt>
+<./imgs/multigrid_jac_comparison_tiny.png, id=128, 906.38625pt x 866.23625pt>
 File: ./imgs/multigrid_jac_comparison_tiny.png Graphic file (type png)
 
 <use ./imgs/multigrid_jac_comparison_tiny.png>
@@ -489,22 +489,15 @@ Package atveryend Info: Empty hook `AfterLastShipout' on input line 325.
 (./ReducedApproachReport.aux)
 Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 325.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 325.
-
-
-Package rerunfilecheck Warning: File `ReducedApproachReport.out' has changed.
-(rerunfilecheck)                Rerun to get outlines right
-(rerunfilecheck)                or use package `bookmark'.
-
-Package rerunfilecheck Info: Checksums for `ReducedApproachReport.out':
-(rerunfilecheck)             Before: 4E09643BD4066417A05EE267EA0CF337;885
-(rerunfilecheck)             After:  3E3E5BDD4019B67082035F4918EBADF2;205.
+Package rerunfilecheck Info: File `ReducedApproachReport.out' has not changed.
+(rerunfilecheck)             Checksum: 3E3E5BDD4019B67082035F4918EBADF2;205.
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 325.
  ) 
 Here is how much of TeX's memory you used:
- 8105 strings out of 493089
- 116785 string characters out of 6134842
- 253297 words of memory out of 5000000
- 11279 multiletter control sequences out of 15000+600000
+ 8096 strings out of 493089
+ 116641 string characters out of 6134842
+ 253288 words of memory out of 5000000
+ 11270 multiletter control sequences out of 15000+600000
  11002 words of font info for 43 fonts, out of 8000000 for 9000
  1302 hyphenation exceptions out of 8191
  34i,12n,42p,785b,1260s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -527,10 +520,10 @@ texmf-dist/fonts/type1/public/amsfonts/cm/cmti8.pfb></usr/local/texlive/2015/te
 xmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2015/tex
 mf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb></usr/local/texlive/2015/texmf
 -dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on ReducedApproachReport.pdf (7 pages, 560284 bytes).
+Output written on ReducedApproachReport.pdf (7 pages, 559525 bytes).
 PDF statistics:
- 258 PDF objects out of 1000 (max. 8388607)
- 219 compressed objects within 3 object streams
+ 230 PDF objects out of 1000 (max. 8388607)
+ 192 compressed objects within 2 object streams
  59 named destinations out of 1000 (max. 500000)
- 125 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 53 words of extra memory for PDF output out of 10000 (max. 10000000)
 
