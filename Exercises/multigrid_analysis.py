@@ -110,22 +110,13 @@ def plot_mulitgrid_stat():
     
 
 def sparse_sol():
-    omega = 0.5
-    nu1 = 3
-    nu2 = 3
     nu=0.01
-    level = 3
     l=4
     m = 2**l -1
-
     A = fd_laplace(m,2)
-    
-    u_sol = np.random.rand(m**2)
-    u_guess = np.zeros((m**2))
-    
+    u_sol = np.random.rand(m**2)    
     A_2 = A.dot(A)
-    S_jacobi = sparse.eye((m**2)) + nu * A_2        
-    
+    S_jacobi = sparse.eye((m**2)) + nu * A_2            
     f =  S_jacobi.dot(u_sol)
     sparse.linalg.spsolve(S_jacobi, f)
     
@@ -137,15 +128,11 @@ def multi_sol():
     level = 3
     l=4
     m = 2**l -1
-
-    A = fd_laplace(m,2)
-    
+    A = fd_laplace(m,2)    
     u_sol = np.random.rand(m**2)
-    u_guess = np.zeros((m**2))
-    
+    u_guess = np.zeros((m**2))    
     A_2 = A.dot(A)
-    S_jacobi = sparse.eye((m**2)) + nu * A_2        
-    
+    S_jacobi = sparse.eye((m**2)) + nu * A_2            
     f =  S_jacobi.dot(u_sol)
     multigrid_jacobi(nu, f, u_guess, m, omega, nu1, nu2, level)
 
