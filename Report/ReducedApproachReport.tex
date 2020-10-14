@@ -290,9 +290,9 @@ and
 \vec{u}^{n+1}    =  \vec{u}^n+ \omega D^{-1}  (\vec{f} - (\nu \Id + A^2) \vec{u}^n)
 \label{eq: dampedJacobi}
 \end{equation}
-In the following we will refer to \eqref{eq: stationaryMethod} as the stationary method, in order to distinguish this method from \eqref{eq: dampedJacobi} which is called damped Jacobi method with damping parameter $\omega \in (0,1] $. We used \eqref{eq: stationaryMethod} to solve  \eqref{eq:normalOptimalitySystem} and \eqref{eq: dampedJacobi} to solve \eqref{eq:factoredOptimalitySystem}. Now we want to apply \eqref{eq: stationaryMethod} and \eqref{eq: dampedJacobi} as smoother in a multigrid methods. In both multigrid methods we use the interpolation matrix $P$ and the full weighting restriction matrix $R:= \frac{1}{2} P^T$  in our coarse correction step. Furthermore we do 2 Pre-Smoothing and 2 Post-Smoothing steps. 
+In the following we will refer to \eqref{eq: stationaryMethod} as the stationary method, in order to distinguish this method from \eqref{eq: dampedJacobi}, which is called damped Jacobi method with damping parameter $\omega \in (0,1] $. We used \eqref{eq: stationaryMethod} to solve  \eqref{eq:normalOptimalitySystem} and \eqref{eq: dampedJacobi} to solve \eqref{eq:factoredOptimalitySystem}. Now we want to apply \eqref{eq: stationaryMethod} and \eqref{eq: dampedJacobi} as smoothers in a multigrid method. In both multigrid methods we use the interpolation matrix $P$ and the full weighting restriction matrix $R:= \frac{1}{2} P^T$  in our coarse correction step. Furthermore we do 2 Pre-Smoothing and 2 Post-Smoothing steps. 
 \subsection{Stationary Method as Smoother}
-First we analyse \eqref{eq: stationaryMethod} and it's corresponding multigrid method. We expect that the convergence of our multigrid methods gets better for rising $\nu$. Because regarding the notation of the script $M^{-1} N = - \frac{1}{\nu} A^{-2} $ is the iteration matrix of the stationary method. Therefore our stationary method converges faster for $\nu $ rising, which is shown in \ref{sec:DampedJacobi}. For smaller $\nu$ we can expect slower or not even convergence at all, if the stationary method does not converge. 
+First we analyse \eqref{eq: stationaryMethod} and it's corresponding multigrid method. We expect that the convergence of our multigrid methods gets better for rising $\nu$. Regarding the notation of the script $M^{-1} N = - \frac{1}{\nu} A^{-2} $ is the iteration matrix of the stationary method. Therefore our stationary method converges faster for $\nu $ rising, which is shown in \ref{sec:DampedJacobi}. For smaller $\nu$ we can expect slower or not even convergence at all, if the stationary method does not converge. 
 
 
 \begin{figure}[h!]
@@ -309,9 +309,8 @@ Now let us check, if our predictions were right. From figure \ref{fig: multigrid
 \subsection{Damped Jacobi as Smoother}
 Now we want to analyse the multigrid method with damped jacobi as smoother. We set $\omega= 0.5$, so we go half the way of every step. Let's make some predictions what happens, if we run our multigrid method. First we expect, that the multigrid method will be faster for shrinking $\nu$ and slower for bigger $\nu$. Because of $I + \nu A^2$ is diagonal dominant for small $\nu$, and Jacobi converges for such systems. For rising $\nu$, we'll lose this effect. Nevertheless, $A^2$ is block tridiagonal:
 \begin{align*}
-A^2\\
-= (I \otimes T + T \otimes I)^2 \\
-= 2  \cdot T \otimes T + T^2 \otimes \Id + \Id \otimes T^2 
+A^2 &= (I \otimes T + T \otimes I)^2 \\
+&= 2  \cdot T \otimes T + T^2 \otimes \Id + \Id \otimes T^2 
 \end{align*}
 That's why Jacobi should still produces reasonable results. 
 \begin{figure}[h!]
