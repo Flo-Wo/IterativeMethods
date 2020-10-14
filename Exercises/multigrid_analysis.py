@@ -157,21 +157,3 @@ multigrid_vs_sparse()
 #plot_mulitgrid_stat()
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<<<<<<< HEAD
-=======
-
->>>>>>> 0c3eb15a860ad94273aae4de8baba0d94e98f8c2
