@@ -30,14 +30,10 @@
 \renewcommand{\vec}{\textbf}
 \usepackage{graphicx}
 \usepackage[left=2cm,right=2cm,top=2.6cm,bottom=1.4cm,includefoot]{geometry}
-\usepackage{hyperref}
+\usepackage[hidelinks]{hyperref}
+\setcounter{tocdepth}{1}    % entries down to \sections in the TOC
 \newcommand{\norm}[1]{\left\lVert#1\right\rVert}
-%% tikz pictures
-\usepackage{pgfplots}
-%\DeclareUnicodeCharacter{2212}{−}
-\usepgfplotslibrary{groupplots,dateplot}
-\usetikzlibrary{patterns,shapes.arrows}
-\pgfplotsset{compat=newest}
+
 
 
 \begin{document}
