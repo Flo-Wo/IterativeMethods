@@ -135,11 +135,7 @@ def multi_sol():
     nu2 = 3
     nu=0.01
     level = 3
-<<<<<<< HEAD
-    l=3
-=======
     l=4
->>>>>>> 0c3eb15a860ad94273aae4de8baba0d94e98f8c2
     m = 2**l -1
 
     A = fd_laplace(m,2)
@@ -156,10 +152,6 @@ def multi_sol():
 def multigrid_vs_sparse():
     time=timeit.timeit("multi_sol()", setup="from multigrid_analysis import multi_sol")
     print(time)
-<<<<<<< HEAD
-
-=======
->>>>>>> 0c3eb15a860ad94273aae4de8baba0d94e98f8c2
 multigrid_vs_sparse()
 #plot_mulitgrid_jacobi()
 #plot_mulitgrid_stat()

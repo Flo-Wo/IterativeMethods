@@ -17,8 +17,12 @@ from ReducedModel import fd_laplace, solver_poisson_unfactored_cg, solver_poisso
 import matplotlib.pyplot as plt
 plt.close('all')
 
+# generate tikz picture from the plot
+import tikzplotlib
+
 def plot_convergenceRate():
-    plt.figure(figsize = (30, 30))
+    plt.figure(figsize = (30, 20))
+    #plt.suptitle(r"Convergence analysis of cg-method using different values of $m$ and $\nu$")
     j = 1
     for k in range(4):
         nu = 0.01 * 10**k
@@ -26,13 +30,9 @@ def plot_convergenceRate():
             # create test vectors to get the system behaviour
             m = 2**l-1
             y_d = 10*np.ones(m**2)
-            
             u_sol = np.random.rand(m**2)
-            
             u_guess = np.random.rand(m**2)
-            
             A = fd_laplace(m,d=2)
-    
             # calculate f, as the real solutions is already known
             f  = (-1)*(nu* A.dot(A.dot(u_sol)) + u_sol - A.dot(y_d))
             # use the solver of the unfactored system
@@ -45,12 +45,14 @@ def plot_convergenceRate():
             plt.semilogy(x, res, "r-", label="initial system")
             plt.semilogy(x_factored, res_factored, "b-", label="factored system")
             plt.legend(loc="upper right")
+            plt.ylabel("norm of residual")
+            plt.xlabel("number of iterations")
             plt.title(r"$m =$ {0}, $\nu =$ {1}".format(m, nu))
             j+=1
     plt.tight_layout()
     plt.show()
 
-def plot_conditionNumber():       
+def plot_conditionNumber():
     plt.figure(figsize = (15, 25))
     j = 1
     for l in range(4,7):
@@ -72,28 +74,9 @@ def plot_conditionNumber():
         plt.title(r"$m =$ {}".format(m))
         plt.xlabel(r"values of $\nu$")
         plt.ylabel("condition number of the system")
-    
         j+=1
     plt.tight_layout()
     plt.show()
-    
-#plot_convergenceRate()
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+ 
+plot_convergenceRate()
 
-    

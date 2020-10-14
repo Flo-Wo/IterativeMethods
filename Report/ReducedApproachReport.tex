@@ -26,12 +26,18 @@
 
 %%% Florian
 
-\newcommand{\Id}{\mathrm{Id}}
+\newcommand{\Id}{\mathrm{I}}
 \renewcommand{\vec}{\textbf}
 \usepackage{graphicx}
 \usepackage[left=2cm,right=2cm,top=2.6cm,bottom=1.4cm,includefoot]{geometry}
 \usepackage{hyperref}
 \newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+%% tikz pictures
+\usepackage{pgfplots}
+%\DeclareUnicodeCharacter{2212}{−}
+\usepgfplotslibrary{groupplots,dateplot}
+\usetikzlibrary{patterns,shapes.arrows}
+\pgfplotsset{compat=newest}
 
 
 \begin{document}
@@ -220,7 +226,7 @@ about Krylov methods.
 %% ====================================================================
 
 \subsection{Damped Jacobi}
-
+\label{sec:DampedJacobi}
 %% ====================================================================
 \newpage
 \section{Krylov Methods}
@@ -237,7 +243,7 @@ equation. So in both cases the solution process is completely matrix-free.
 Looking at figure \ref{fig:CG-convergence}, we can see the  convergence behaviour of the two systems. In the plots $\nu$ ist getting bigger going from top to bottom and $m$ is getting bigger going from left to right.
 \begin{figure}[h!]
 \centering
-\includegraphics[scale=0.56]{./imgs/CG_analysis}
+\includegraphics[scale=0.52]{./imgs/CG_analysis}
 \caption{Convergence behaviour for different values of $m$ and $\nu$ using CG to solve the systems. The x-axis is representing the number of iterations
 and the y-axis the 2-norm of the residuals.}
 \label{fig:CG-convergence}
@@ -301,9 +307,6 @@ Now let us check, if our predictions were right. From figure \ref{fig: multigrid
 %% ====================================================================
 
 \subsection{Damped Jacobi as Smoother}
-<<<<<<< HEAD
-\hfill
-=======
 Now we want to analyse the multigrid method with damped jacobi as smoother. We set $\omega= 0.5$, so we go half the way of every step. Let's make some predictions what happens, if we run our multigrid method. First we expect, that the multigrid method will be faster for shrinking $\nu$ and slower for bigger $\nu$. Because of $I + \nu A^2$ is diagonal dominant for small $\nu$, and Jacobi converges for such systems. For rising $\nu$, we'll lose this effect. Nevertheless, $A^2$ is block tridiagonal:
 \begin{align*}
 A^2\\
@@ -323,6 +326,5 @@ Again let's verify our predictions. In figure \ref{fig: multigridJacobi} we can 
 \Id   \vec{v} = \vec{f}
 \] 
 and the solution isn't so meaningful.
-Moreover we can see, that the multigrid method converges slower for $\nu$ rising. So thats again, what we predicted. From figure \ref*{fig: multigridJacobi} we really see, that our multigrid method is independent of the size $m$. We are able to observe this phenomenon in nearly every row. 
->>>>>>> 05b9222477d001209b1681ef506f820b6c8e50a1
+Moreover we can see, that the multigrid method converges slower for $\nu$ rising. So thats again, what we predicted. From figure \ref*{fig: multigridJacobi} we really see, that our multigrid method is independent of the size $m$. We are able to observe this phenomenon in nearly every row.
 \end{document}
