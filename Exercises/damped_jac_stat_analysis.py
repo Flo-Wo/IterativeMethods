@@ -22,7 +22,7 @@ def get_norm_jac_iteration_matrix(m,nu,omega):
     D=np.diag(np.diag(System))
     D_inv=omega *np.linalg.inv(D)
     It_matrix=D_inv.dot((1/omega)*D-System)
-    return np.linalg.norm(It_matrix)
+    return np.linalg.norm(It_matrix, ord=2)
 
 
 def get_norm_stat_iteration_matrix(m,nu):
@@ -38,17 +38,17 @@ def get_norm_stat_iteration_matrix(m,nu):
 
 def plot_norm_iteration_matrix_jac():
     plt.figure(figsize = (15, 15))
-    plt.suptitle(r" norm of iteration matrix of damped jacobi, ehich is $|| \omega D^{-1} (I+ \nu A^2) || $, where D=diag( I+ \nu A^2)")
+    #plt.suptitle(r" norm of iteration matrix of damped jacobi, ehich is $|| \omega D^{-1} (I+ \nu A^2) || $, where D=diag( I+ \nu A^2)")
     j=1
     
     for s in range(0,4):
         omega=0.125 * 2**s
-        for l in range(4,7):
+        it = 10
+        for l in range(4,5):
                         
             m = 2**l -1
-            it=7
-            y=np.zeros((it,1))
-            nu=np.zeros((it,1))
+            y=np.zeros(it)
+            nu=np.zeros(it)
             for i in range(0,it):
                 nu[i] = 0.00001*10**i
                 y[i]=get_norm_jac_iteration_matrix(m,nu[i],omega)
@@ -56,12 +56,14 @@ def plot_norm_iteration_matrix_jac():
             x=nu
             plt.subplot(4,3,j)
             
-            plt.semilogy(x, y, "r-", label="norm of iteration matrix of jacobi")
+            plt.semilogx(x, y, "r-", label=r"$\omega$ = {}".format(omega))
             plt.legend(loc="upper right")
-            plt.title(r"$m =$ {0},   $\omega=$ {1}".format(m, omega))
+            #plt.title(r"$m =$ {0},   $\omega=$ {1}".format(m, omega))
             plt.ylabel("norm ")
+            plt.xticks(x)
+            plt.yscale("log")
             j= j + 1
-    #plt.tight_layout()
+    plt.tight_layout()
     plt.show()
     
 def plot_norm_iteration_matrix_stat():
@@ -69,12 +71,12 @@ def plot_norm_iteration_matrix_stat():
     plt.suptitle(r" norm of iteration matrix of the stationary method which is $|| \nu A^{-2} || $")
     j=1
     
-    for l in range(4,7):
+    for l in range(4,5):
                     
         m = 2**l -1
         it=7
-        y=np.zeros((it,1))
-        nu=np.zeros((it,1))
+        y=np.zeros(it)
+        nu=np.zeros(it)
         for i in range(0,it):
             nu[i] = 0.00001*10**i
             y[i]=get_norm_stat_iteration_matrix(m,nu[i])
@@ -82,7 +84,7 @@ def plot_norm_iteration_matrix_stat():
         x=nu
         plt.subplot(1,3,j)
         
-        plt.semilogy(x, y, "r-", label="norm of iteration matrix of the stationary method")
+        plt.semilogx(x, y, "r-", label="norm of iteration matrix of the stationary method")
         plt.legend(loc="upper right")
         plt.title(r"$m =$ {0} ".format(m))
         plt.ylabel("norm ")
@@ -90,40 +92,38 @@ def plot_norm_iteration_matrix_stat():
     #plt.tight_layout()
     plt.show()
     
-def plot_norm_iteration_matrix_stat_jac():
-    plt.figure(figsize = (15, 15))
-    j=1
+# def plot_norm_iteration_matrix_stat_jac():
+#     plt.figure(figsize = (15, 15))
+#     j=1
     
-    for s in range(0,4):
-        omega=0.125 * 2**s
-        for l in range(4,7):
+#     for s in range(0,1):
+#         omega=0.125 * 2**s
+#         for l in range(4,5):
                         
-            m = 2**l -1
-            it=7
-            y_jac=np.zeros((it,1))
-            y_stat=np.zeros((it,1))
-            nu=np.zeros((it,1))
-            for i in range(0,it):
-                nu[i] = 0.00001*10**i
-                y_stat[i]=get_norm_stat_iteration_matrix(m,nu[i])
-                y_jac[i]=get_norm_jac_iteration_matrix(m,nu[i],omega)
+#             m = 2**l -1
+#             it=12
+#             y_jac=np.zeros(it)
+#             y_stat=np.zeros(it)
+#             nu=np.zeros((it,1))
+#             for i in range(0,it):
+#                 nu[i] = 0.00001*10**i
+#                 y_stat[i]=get_norm_stat_iteration_matrix(m,nu[i])
+#                 y_jac[i]=get_norm_jac_iteration_matrix(m,nu[i],omega)
             
-            x=nu
-            plt.subplot(4,3,j)
+#             x=nu
+#             plt.subplot(4,3,j)
             
-            plt.semilogy(x, y_stat, "r-", label="norm of iteration matrix of stationary method")
-            plt.semilogy(x, y_jac, "b-", label="norm of iteration matrix of damped")
-            plt.legend(loc="upper right")
-            plt.title(r"$m =$ {0},   $\omega=$ {1}".format(m, omega))
-            plt.ylabel("norm ")
-            j= j + 1
-    #plt.tight_layout()
-    plt.show()
+#             plt.semilogx(x, y_stat, "r-", label="stationary method")
+#             plt.semilogx(x, y_jac, "b-", label="damped")
+#             plt.legend(loc="upper right")
+#             plt.title(r"$m =$ {0},   $\omega=$ {1}".format(m, omega))
+#             plt.ylabel("norm ")
+#             plt.yscale("log")
+#             j= j + 1
+#     plt.tight_layout()
+#     plt.show()
 
-n=256
-m=16
-nu=1000
-omega=0.3
-plot_norm_iteration_matrix_jac()
-plot_norm_iteration_matrix_stat()
-plot_norm_iteration_matrix_stat_jac()
+
+#plot_norm_iteration_matrix_jac()
+#plot_norm_iteration_matrix_stat()
+#plot_norm_iteration_matrix_stat_jac()
