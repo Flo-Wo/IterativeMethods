@@ -38,6 +38,20 @@ to analyse their convergence behaviour.
 """
 
 def create_norm(m):
+    """
+    Function to generate our discretized norm based on the parameter m
+
+    Parameters
+    ----------
+    m : integer
+        number of grid points used
+
+    Returns
+    -------
+    norm : callable
+        norm(x) = h**2 * ||x||_2
+
+    """
     h = 1/(m+1)
     def norm(v):
         sol = h**2 * np.linalg.norm(v)

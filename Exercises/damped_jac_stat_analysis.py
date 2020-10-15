@@ -125,5 +125,5 @@ def plot_norm_iteration_matrix_stat():
 
 
 #plot_norm_iteration_matrix_jac()
-#plot_norm_iteration_matrix_stat()
+plot_norm_iteration_matrix_stat()
 #plot_norm_iteration_matrix_stat_jac()
