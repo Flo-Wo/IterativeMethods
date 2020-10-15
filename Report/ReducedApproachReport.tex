@@ -25,7 +25,7 @@
 
 
 %%% Florian
-
+\usepackage[foot]{amsaddr}
 \newcommand{\Id}{\mathrm{I}}
 \renewcommand{\vec}{\textbf}
 \usepackage{graphicx}
@@ -43,6 +43,7 @@
 %author information
 \author{Thanh-Van Huynh, Michael Thiele, Florian Wolf}
 \email{thanh-van.huynh@uni-konstanz.de, michael.thiele@uni-konstanz.de, florian.2.wolf@uni-konstanz.de}
+\date{\today}
 
 %\dedicatory{Thanks Gabriele and Christian for your great work.}
 
@@ -240,8 +241,8 @@ Looking at figure \ref{fig:CG-convergence}, we can see the  convergence behaviou
 \begin{figure}[h!]
 \centering
 \includegraphics[scale=0.52]{./imgs/CG_analysis}
-\caption{Convergence behaviour for different values of $m$ and $\nu$ using CG to solve the systems. The x-axis is representing the number of iterations
-and the y-axis the 2-norm of the residuals.}
+\caption{Convergence behaviour for different values of $m$ and $\nu$ using CG to solve the systems.
+The x-axis is representing the number of iterations and the y-axis the 2-norm of the residuals.}
 \label{fig:CG-convergence}
 \end{figure}
 As you can directly see in the plots, the solution process of both systems is getting worse, as the size of the matrix increases. Meanwhile, the behaviour 
