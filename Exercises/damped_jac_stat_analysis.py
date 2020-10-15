@@ -21,7 +21,7 @@ def get_norm_jac_iteration_matrix(m,nu,omega):
     System= np.eye(n)+ nu*A_2
     D=np.diag(np.diag(System))
     D_inv=omega *np.linalg.inv(D)
-    It_matrix=D_inv.dot(System)
+    It_matrix=D_inv.dot((1/omega)*D-System)
     return np.linalg.norm(It_matrix)
 
 
