@@ -671,7 +671,7 @@ def vcycle_jac(nu, nu1, nu2, m, u_guess, f, level, omega):
         return(u_sol, res_norm)
     else:
         ### PRE-SMOOTHING
-        u_nu1,_ ,_ = solver_damped_jacobi(C, u_guess, omega_temp, f, nu1)
+        u_nu1,_ ,_ = solver_damped_jacobi(C, u_guess, omega_temp, f, nu1, norm=norm)
         ### RECURSION
         # restriction matrix (full weighted restriction matrix) to get
         # the smaller system
