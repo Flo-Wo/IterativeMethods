@@ -37,6 +37,12 @@ to analyse their convergence behaviour.
 
 """
 
+def create_norm(m):
+    h = 1/(m+1)
+    def norm(v):
+        sol = h**2 * np.linalg.norm(v)
+        return(sol)
+    return(norm)
 
 def fd_laplace(m, d):
     """
@@ -312,6 +318,8 @@ def solver_stationary(u_guess,nu, y_d, f, m, maxIter=1000, tol=1e-8):
         list with the history of the norm of the residuals
 
     """
+    norm = create_norm(m)
+    
     # get decomposition for fast poisson solver
     lam, V = laplace_small_decomposition(m)
     k = 1
@@ -330,7 +338,7 @@ def solver_stationary(u_guess,nu, y_d, f, m, maxIter=1000, tol=1e-8):
     operator = LinearOperator((m**2,m**2),op)
     
     # append norm of the first residual
-    res = np.linalg.norm(operator(u_k) - right_side)
+    res = norm(operator(u_k) - right_side)
     res_list.append(res)
     
     while res >= tol and k < maxIter:
@@ -339,7 +347,7 @@ def solver_stationary(u_guess,nu, y_d, f, m, maxIter=1000, tol=1e-8):
         
         u_k = ((-1)*(1/nu) * fast_poisson(V, V, lam, lam, temp))+ 1/nu*right_side
         # append norm of the residual
-        res = np.linalg.norm(operator(u_k) - right_side)
+        res = norm(operator(u_k) - right_side)
         res_list.append(res)
         
         k+=1
@@ -383,6 +391,7 @@ def solver_stationary_fixedRight(u_guess,nu, right_side, m, maxIter=500, tol=1e-
         list with the history of the norm of the residuals
 
     """
+    norm = create_norm(m)
     # get decomposition for fast poisson solver
     lam, V = laplace_small_decomposition(m)
     k = 1
@@ -395,7 +404,7 @@ def solver_stationary_fixedRight(u_guess,nu, right_side, m, maxIter=500, tol=1e-
     op = get_system(m,nu)
     operator = LinearOperator((m**2,m**2),op)
     # caclculate the first norm of the residual
-    res = np.linalg.norm(operator(u_k) - right_side)
+    res = norm(operator(u_k) - right_side)
     res_list.append(res)
     
     while res >= tol and k < maxIter:
@@ -403,7 +412,7 @@ def solver_stationary_fixedRight(u_guess,nu, right_side, m, maxIter=500, tol=1e-
         # solve current iteration
         u_k = ((-1)*(1/nu) * fast_poisson(V, V, lam, lam, temp))+ 1/nu*right_side
         # update history of the residuals
-        res = np.linalg.norm(operator(u_k) - right_side)
+        res = norm(operator(u_k) - right_side)
         res_list.append(res)
         
         k+=1
@@ -451,6 +460,7 @@ def solver_poisson_unfactored_cg(u_guess, nu, y_d, f, m, tol=1e-8):
     #initializing iteration count and residual history
     num_iters = 0
     res = []
+    h = 1/(m+1)
     
     # create callback function to get residual history 
     # and the iteration counter from the build in cg-method
@@ -458,7 +468,7 @@ def solver_poisson_unfactored_cg(u_guess, nu, y_d, f, m, tol=1e-8):
         nonlocal num_iters
         num_iters += 1
         frame = inspect.currentframe().f_back
-        res.append(frame.f_locals['resid'])
+        res.append(h**2 * frame.f_locals['resid'])
     
     # get decomposition
     lam, V = laplace_small_decomposition(m)
@@ -520,13 +530,15 @@ def solver_poisson_factored_cg(u_guess, nu, y_d, f, m,tol=1e-8):
     num_iters = 0
     res = []
     
+    h = 1/(m+1)
+    
     # create callback function to get residual history 
     # and the iteration counter
     def callback(xk):
         nonlocal num_iters
         num_iters += 1
         frame = inspect.currentframe().f_back
-        res.append(frame.f_locals['resid'])
+        res.append(h**2 * frame.f_locals['resid'])
     
     # init 1D and 2D laplacian matrices
     #A_small = fd_laplace(m, d=1)
@@ -551,7 +563,7 @@ def solver_poisson_factored_cg(u_guess, nu, y_d, f, m,tol=1e-8):
     
 
 
-def solver_damped_jacobi(A, u_guess, omega, f, maxIter,tol=1e-8):
+def solver_damped_jacobi(A, u_guess, omega, f, maxIter,tol=1e-8, norm=()):
     """
     Function to solve a system 
     
@@ -585,6 +597,11 @@ def solver_damped_jacobi(A, u_guess, omega, f, maxIter,tol=1e-8):
         list with the history of the norm of the residuels
 
     """
+    
+    if norm == ():
+        def norm(v):
+            return(np.linalg.norm(v))
+    
     # get diagonal matrix in csr form, to manipulate its entries
     D_inverse = sparse.diags(1/(A.diagonal()),format="csr")
     # get size of the matrix
@@ -594,7 +611,7 @@ def solver_damped_jacobi(A, u_guess, omega, f, maxIter,tol=1e-8):
     res = []
     u_k = u_guess
     resi = (f - A.dot(u_k))
-    resi_norm = np.linalg.norm(resi)
+    resi_norm = norm(resi)
     # get norm of the first residual
     res.append(resi_norm)
     while resi_norm >= tol and k < maxIter:
@@ -602,7 +619,7 @@ def solver_damped_jacobi(A, u_guess, omega, f, maxIter,tol=1e-8):
         u_k = u_k + omega* D_inverse.dot(resi)
         # calculate the norm of the current residual
         resi = f -  A.dot(u_k)
-        resi_norm = np.linalg.norm(resi)
+        resi_norm = norm(resi)
         res.append(resi_norm)
         k=k+1
     return(u_k, k, res)
@@ -639,6 +656,8 @@ def vcycle_jac(nu, nu1, nu2, m, u_guess, f, level, omega):
         list with the norm of the residuals
 
     """
+    
+    norm = create_norm(m)
     # construct matrix to get the right-hand side of the system
     A = fd_laplace(m, d=2)
     A_2 = np.dot(A,A)
@@ -648,7 +667,7 @@ def vcycle_jac(nu, nu1, nu2, m, u_guess, f, level, omega):
     if level == 1:
         # on the last level the system gets solved with the build-in solver
         u_sol = sparse.linalg.spsolve(C, f)
-        res_norm = np.linalg.norm(f - C.dot(u_sol))
+        res_norm = norm(f - C.dot(u_sol))
         return(u_sol, res_norm)
     else:
         ### PRE-SMOOTHING
@@ -673,7 +692,7 @@ def vcycle_jac(nu, nu1, nu2, m, u_guess, f, level, omega):
         u_new = u_nu1 + P.dot(u_temp)
         ### POST-SMOOTHING        
         u_nu2,_ ,_ = solver_damped_jacobi(C, u_new, omega, f, nu2)
-        res_norm = np.linalg.norm(f - C.dot(u_nu2))
+        res_norm = norm(f - C.dot(u_nu2))
         return(u_nu2, res_norm)
 
 
@@ -711,7 +730,7 @@ def multigrid_jacobi(nu, f, u_guess, m, omega, nu1, nu2, level,maxIter=1000, tol
         number of iterations neede
 
     """
-
+    norm = create_norm(m)
     u_sol, res = vcycle_jac(nu, nu1, nu2, m, u_guess, f, level, omega)
     k = 1
     A = fd_laplace(m, d=2)
@@ -719,7 +738,7 @@ def multigrid_jacobi(nu, f, u_guess, m, omega, nu1, nu2, level,maxIter=1000, tol
     C = sparse.eye((m**2)) + nu * A_2
     u_sol=u_guess
     res_his = []
-    res = np.linalg.norm( f - C.dot(u_sol)) 
+    res = norm( f - C.dot(u_sol)) 
     res_his.append(res)
     while res >= tol and k < maxIter  and res <= 10e20 :
         u_sol, res = vcycle_jac(nu, nu1, nu2, m, u_sol, f, level, omega)
@@ -757,6 +776,7 @@ def vcycle_stat(nu, nu1, nu2, m, u_guess, f, level):
         list with the norm of the residuals
 
     """
+    norm = create_norm(m)
     #construct linear operator
     op = get_system(m,nu)
     C = LinearOperator((m**2,m**2),op)
@@ -767,7 +787,7 @@ def vcycle_stat(nu, nu1, nu2, m, u_guess, f, level):
             e[i] = 1
             system[i,:] = C.matvec(e)
         u_sol = np.linalg.solve(system, f) #######
-        res_norm = np.linalg.norm(f - C(u_sol))
+        res_norm = norm(f - C(u_sol))
         return(u_sol, res_norm)
     else:
         ### PRE-SMOOTHING
@@ -793,7 +813,7 @@ def vcycle_stat(nu, nu1, nu2, m, u_guess, f, level):
         u_new = u_nu1 + P.dot(u_temp)
         ### POST-SMOOTHING        
         u_nu2,_ ,_ = solver_stationary_fixedRight(u_new, nu, f, m, maxIter=nu2)
-        res_norm = np.linalg.norm(f - C(u_nu2))
+        res_norm = norm(f - C(u_nu2))
         return(u_nu2, res_norm)
 
 
@@ -829,11 +849,12 @@ def multigrid_stat(nu, f, u_guess, m, nu1, nu2, level, maxIter=1000,tol=1e-6):
         number of iterations neede
 
     """
+    norm = create_norm(m)
     u_sol, res = vcycle_stat(nu, nu1, nu2, m, u_guess, f, level)
     u_sol=u_guess
     op = get_system(m,nu)
     C = LinearOperator((m**2,m**2),op)
-    res  = np.linalg.norm(f - C(u_sol))
+    res  = norm(f - C(u_sol))
     k = 1
     res_his = []
     res_his.append(res)
