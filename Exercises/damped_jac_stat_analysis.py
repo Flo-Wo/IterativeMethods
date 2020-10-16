@@ -16,9 +16,9 @@ import matplotlib.pyplot as plt
 
 def get_norm_jac_iteration_matrix(m,nu,omega):
     A = fd_laplace(m,2).toarray()
-    n=m**2
-    A_2=A.dot(A)
-    System= np.eye(n)+ nu*A_2
+    n = m**2
+    A_2 = A.dot(A)
+    System = np.eye(n)+ nu*A_2
     D=np.diag(np.diag(System))
     D_inv=omega *np.linalg.inv(D)
     It_matrix=D_inv.dot((1/omega)*D-System)
@@ -44,7 +44,7 @@ def plot_norm_iteration_matrix_jac():
     for s in range(0,4):
         omega=0.125 * 2**s
         it = 10
-        for l in range(4,5):
+        for l in range(4,6):
                         
             m = 2**l -1
             y=np.zeros(it)
@@ -58,7 +58,7 @@ def plot_norm_iteration_matrix_jac():
             
             plt.semilogx(x, y, "r-", label=r"$\omega$ = {}".format(omega))
             plt.legend(loc="upper right")
-            #plt.title(r"$m =$ {0},   $\omega=$ {1}".format(m, omega))
+            plt.title(r"$m =$ {0},   $\omega=$ {1}".format(m, omega))
             plt.ylabel("norm ")
             plt.xticks(x)
             plt.yscale("log")
@@ -124,6 +124,6 @@ def plot_norm_iteration_matrix_stat():
 #     plt.show()
 
 
-#plot_norm_iteration_matrix_jac()
-plot_norm_iteration_matrix_stat()
+plot_norm_iteration_matrix_jac()
+#plot_norm_iteration_matrix_stat()
 #plot_norm_iteration_matrix_stat_jac()

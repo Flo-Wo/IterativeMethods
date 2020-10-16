@@ -7,7 +7,9 @@ Created on Fri Oct  9 08:32:14 2020
 import numpy as np
 from scipy.sparse.linalg import LinearOperator
 from ReducedModel import fd_laplace, condition_number_factored, condition_number_normal,\
-    multigrid_jacobi, get_system, multigrid_stat,solver_stationary_fixedRight,solver_damped_jacobi
+    multigrid_jacobi, get_system, multigrid_stat,solver_stationary_fixedRight,solver_damped_jacobi,\
+    fast_poisson, laplace_small_decomposition
+    
 from scipy import sparse
 import matplotlib.pyplot as plt
 import timeit
@@ -18,23 +20,23 @@ plt.close('all')
 # =============================================================================
 
 def plot_mulitgrid_jacobi():
-    omega = 0.5
+    omega = 2/3
     plt.figure(figsize = (20, 20))
-    plt.suptitle(r"Using multigrid to solve the system $(\ nu \cdot A^2+  I )v = f$ with dampeed jacobi with damping parameter $\omega =$ {}   and  comparing this to the convergence of the smoother as a stationary method".format(omega))
+    #plt.suptitle(r"Using multigrid to solve the system $(\ nu \cdot A^2+  I )v = f$ with dampeed jacobi with damping parameter $\omega =$ {}   and  comparing this to the convergence of the smoother as a stationary method".format(omega))
     nu1 = 3
     nu2 = 3
     level = 3
     j=1
-    for i in range(0,4):    
+    for i in range(0,2):    
         nu= 0.01 * 10**i
-        for l in range(4,7):
+        for l in range(4,6):
             
             m = 2**l -1
-    
+            h = 1/(m+1)
             A = fd_laplace(m,2)
             
             u_sol = np.random.rand(m**2)
-            u_guess = np.zeros((m**2))
+            u_guess = np.zeros(m**2)
             
             A_2 = A.dot(A)
             S_jacobi = sparse.eye((m**2)) + nu * A_2        
@@ -66,29 +68,40 @@ def plot_mulitgrid_jacobi():
 # =============================================================================
 def plot_mulitgrid_stat():
     plt.figure(figsize = (20, 20))
-    plt.suptitle(r" Using multigrid to solve the system  $(\nu I + A^{-2} ) v = f $ with the given stationary method as smoother and  comparing this to the convergence of the smoother as a stationary method")
-    nu1 = 3
-    nu2 = 3
+    #plt.suptitle(r" Using multigrid to solve the system  $(\nu I + A^{-2} ) v = f $ with the given stationary method as smoother and  comparing this to the convergence of the smoother as a stationary method")
+    nu1 = 2
+    nu2 = 2
     level = 3
     j=1
-    for i in range(0,4):    
-        nu= 100 * 10**i
-        for l in range(4,7):
+    for i in range(0,1):    
+        nu= 1 * 10**i
+        for l in range(5,6):
             
             m = 2**l -1
             
-            u_sol = np.random.rand(m**2)
-            u_guess = np.zeros((m**2))
+            u_sol = np.zeros(m**2)
+            u_guess = np.zeros(m**2)
             
             #construct linear operator
             
-            op = get_system(m,nu)
+            f = - np.ones(m**2)
+            y_d = np.ones(m**2)
             
-            S_stat = LinearOperator((m**2,m**2),op)
-            f_stat = S_stat(u_sol)
+            lam, V = laplace_small_decomposition(m)
+            f_temp = (-1)*(y_d + fast_poisson(V, V, lam, lam, f))
+            
+            f_stat = fast_poisson(V, V, lam, lam, f_temp)
+            #print(f_stat)
+            #print("\n\n")
+            
+            # op = get_system(m,nu)
+            
+            # S_stat = LinearOperator((m**2,m**2),op)
+            # f_stat = S_stat(u_sol)
             
             u_stat, res_stat, k_stat = multigrid_stat(nu, f_stat, u_guess, m, \
                                                       nu1, nu2, level)
+            print(res_stat)
             u_stat_m, k_stat_m, res_stat_m = solver_stationary_fixedRight(u_guess,nu,\
                                                                           f_stat, m, maxIter=k_stat)
             x_stat = np.arange(0,k_stat)
@@ -138,8 +151,8 @@ def multi_sol():
 def multigrid_vs_sparse():
     time=timeit.timeit("multi_sol()", setup="from multigrid_analysis import multi_sol")
     print(time)
-multigrid_vs_sparse()
+#multigrid_vs_sparse()
 #plot_mulitgrid_jacobi()
-#plot_mulitgrid_stat()
+plot_mulitgrid_stat()
 
 

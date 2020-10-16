@@ -54,7 +54,7 @@ def create_norm(m):
     """
     h = 1/(m+1)
     def norm(v):
-        sol = h**2 * np.linalg.norm(v)
+        sol = h * np.linalg.norm(v)
         return(sol)
     return(norm)
 
@@ -75,6 +75,7 @@ def fd_laplace(m, d):
     Laplace matrix for your desired dimension and size
 
     """
+    h = 1/(m+1)
     if d == 1:
         # build matrix blocks 
         four = -2*sparse.identity(m)
@@ -91,7 +92,7 @@ def fd_laplace(m, d):
         eye = sparse.eye(m)
         # T = kron(T_1, I) + kron(I, T_1)
         T = sparse.kron(eye, T_bar) + sparse.kron(T_bar, eye)
-    return(T)
+    return(1/(h**2) * T)
 
 
 def fast_poisson(V, W, mu, lam, b):
@@ -158,16 +159,20 @@ def get_system(m,nu):
     left_side : callable
         function representing the left-hand side of our equation
     """
-    # #A = fd_laplace(m,d=2)
+    A = fd_laplace(m,d=2)
     # A_small = fd_laplace(m,d=1)
     # lam, V = np.linalg.eigh(A_small.toarray())
     eye_nu = nu*sparse.identity(m**2)
     lam, V = laplace_small_decomposition(m)
     def left_side(v):
-        sol = fast_poisson(V,V,lam,lam,v)
-        sol2 = fast_poisson(V,V,lam,lam,sol)
+        sol = sparse.linalg.spsolve(A, v)
+        sol2 = sparse.linalg.spsolve(A, sol)
+        #sol = fast_poisson(V,V,lam,lam,v)
+        #sol2 = fast_poisson(V,V,lam,lam,sol)
         return(eye_nu.dot(v)+sol2)
     return(left_side)
+
+
 
 def get_eigenvector(m,k):
     """
@@ -211,10 +216,11 @@ def laplace_small_decomposition(m):
         with respect to their corresponding eigenvalue in the vector lam
 
     """
+    h = 1/(m+1)
     lam = np.zeros(m)
     V = np.zeros((m,m))
     for k in range(0,m):
-        lam[k] = (-2) + 2*np.cos((np.pi * (k+1))/(m+1))
+        lam[k] = 1/(h**2) * ((-2) + 2*np.cos((np.pi * (k+1))/(m+1)))
         u = get_eigenvector(m,k)
         u = 1/np.linalg.norm(u)*u
         V[:,k] = u
@@ -421,10 +427,17 @@ def solver_stationary_fixedRight(u_guess,nu, right_side, m, maxIter=500, tol=1e-
     res = norm(operator(u_k) - right_side)
     res_list.append(res)
     
+    A = fd_laplace(m, d=2)
+    
     while res >= tol and k < maxIter:
-        temp = fast_poisson(V, V, lam, lam, u_k)
+        temp = sparse.linalg.spsolve(A, u_k)
+        
+        #temp = fast_poisson(V, V, lam, lam, u_k)
+        
         # solve current iteration
-        u_k = ((-1)*(1/nu) * fast_poisson(V, V, lam, lam, temp))+ 1/nu*right_side
+        #temp2 = fast_poisson(V, V, lam, lam, temp)
+        temp2 = sparse.linalg.spsolve(A, temp)
+        u_k = ((-1)*(1/nu) * temp2)+ 1/nu*right_side
         # update history of the residuals
         res = norm(operator(u_k) - right_side)
         res_list.append(res)
@@ -672,6 +685,7 @@ def vcycle_jac(nu, nu1, nu2, m, u_guess, f, level, omega):
     """
     
     norm = create_norm(m)
+    h = 1/(m+1)
     # construct matrix to get the right-hand side of the system
     A = fd_laplace(m, d=2)
     A_2 = np.dot(A,A)
@@ -691,7 +705,7 @@ def vcycle_jac(nu, nu1, nu2, m, u_guess, f, level, omega):
         # the smaller system
         R = RMatrix(m)
         # projection matrix, to get back to the full system
-        P = 2 * R.T
+        P = 4 * R.T
         
         res_temp = f - C.dot(u_nu1)
         
@@ -745,17 +759,21 @@ def multigrid_jacobi(nu, f, u_guess, m, omega, nu1, nu2, level,maxIter=1000, tol
 
     """
     norm = create_norm(m)
-    u_sol, res = vcycle_jac(nu, nu1, nu2, m, u_guess, f, level, omega)
+    u_sol = u_guess
     k = 1
+    h = 1/(m+1)
     A = fd_laplace(m, d=2)
     A_2 = np.dot(A,A)
     C = sparse.eye((m**2)) + nu * A_2
     u_sol=u_guess
+    f_new = f
     res_his = []
     res = norm( f - C.dot(u_sol)) 
     res_his.append(res)
-    while res >= tol and k < maxIter  and res <= 10e20 :
-        u_sol, res = vcycle_jac(nu, nu1, nu2, m, u_sol, f, level, omega)
+    while res >= tol and k < maxIter  and res <= 10e10:
+        u_temp, res = vcycle_jac(nu, nu1, nu2, m, u_sol, f_new, level, omega)
+        u_sol = u_sol + u_temp
+        f_new = f - C.dot(u_sol)
         res_his.append(res)
         k+=1
     return(u_sol, res_his, k)
@@ -812,7 +830,7 @@ def vcycle_stat(nu, nu1, nu2, m, u_guess, f, level):
         # the smaller system
         R = RMatrix(m)
         # projection matrix, to get back to the full system
-        P = 2 * R.T
+        P = 4 * R.T
         
         res_temp = f - C(u_nu1)
         
@@ -828,10 +846,11 @@ def vcycle_stat(nu, nu1, nu2, m, u_guess, f, level):
         ### POST-SMOOTHING        
         u_nu2,_ ,_ = solver_stationary_fixedRight(u_new, nu, f, m, maxIter=nu2)
         res_norm = norm(f - C(u_nu2))
+
         return(u_nu2, res_norm)
 
 
-def multigrid_stat(nu, f, u_guess, m, nu1, nu2, level, maxIter=1000,tol=1e-6):
+def multigrid_stat(nu, f, u_guess, m, nu1, nu2, level, maxIter=50,tol=1e-12):
     """
     Function to run use multigrid as a solver with the stationary method as a 
     smoother. In this case we try to solve the initial system.
@@ -869,11 +888,12 @@ def multigrid_stat(nu, f, u_guess, m, nu1, nu2, level, maxIter=1000,tol=1e-6):
     op = get_system(m,nu)
     C = LinearOperator((m**2,m**2),op)
     res  = norm(f - C(u_sol))
+    res0 = res
     k = 1
     res_his = []
-    res_his.append(res)
-    while res >= tol and k < maxIter and res <= 10e30 :
+    res_his.append(res/res0)
+    while res/res0 >= tol and k < maxIter and res <= 10e10:
         u_sol, res = vcycle_stat(nu, nu1, nu2, m, u_sol, f, level)
         k+=1
-        res_his.append(res)
+        res_his.append(res/res0)
     return(u_sol, res_his, k)

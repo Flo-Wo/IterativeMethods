@@ -242,7 +242,7 @@ Looking at figure \ref{fig:CG-convergence}, we can see the  convergence behaviou
 \centering
 \includegraphics[scale=0.52]{./imgs/CG_analysis}
 \caption{Convergence behaviour for different values of $m$ and $\nu$ using CG to solve the systems.
-The x-axis is representing the number of iterations and the y-axis the 2-norm of the residuals.}
+The x-axis is representing the number of iterations and the y-axis shows the norm of the residuals in the discretized norm.}
 \label{fig:CG-convergence}
 \end{figure}
 As you can directly see in the plots, the solution process of both systems is getting worse, as the size of the matrix increases. Meanwhile, the behaviour 
@@ -287,9 +287,17 @@ and
 \vec{u}^{n+1}    =  \vec{u}^n+ \omega D^{-1}  (\vec{f} - (\nu \Id + A^2) \vec{u}^n)
 \label{eq: dampedJacobi}
 \end{equation}
-In the following we will refer to \eqref{eq: stationaryMethod} as the stationary method, in order to distinguish this method from \eqref{eq: dampedJacobi}, which is called damped Jacobi method with damping parameter $\omega \in (0,1] $. We used \eqref{eq: stationaryMethod} to solve  \eqref{eq:normalOptimalitySystem} and \eqref{eq: dampedJacobi} to solve \eqref{eq:factoredOptimalitySystem}. Now we want to apply \eqref{eq: stationaryMethod} and \eqref{eq: dampedJacobi} as smoothers in a multigrid method. In both multigrid methods we use the interpolation matrix $P$ and the full weighting restriction matrix $R:= \frac{1}{2} P^T$  in our coarse correction step. Furthermore we do 2 Pre-Smoothing and 2 Post-Smoothing steps. 
+In the following we will refer to \eqref{eq: stationaryMethod} as the stationary method, in order to distinguish this method from \eqref{eq: 
+dampedJacobi}, which is called damped Jacobi method with damping parameter $\omega \in (0,1] $. We used \eqref{eq: stationaryMethod} to solve  
+\eqref{eq:normalOptimalitySystem} and \eqref{eq: dampedJacobi} to solve \eqref{eq:factoredOptimalitySystem}. Now we want to apply \eqref{eq: 
+stationaryMethod} and \eqref{eq: dampedJacobi} as smoothers in a multigrid method. In both multigrid methods we use the interpolation matrix $P
+$ and the full weighting restriction matrix $R:= \frac{1}{2} P^T$  in our coarse correction step. Furthermore we do three Pre-Smoothing and 
+three Post-Smoothing steps. 
 \subsection{Stationary Methods as Smoother}
-First we analyse \eqref{eq: stationaryMethod} and it's corresponding multigrid method. We expect that the convergence of our multigrid methods gets better for rising $\nu$. Regarding the notation of the script $M^{-1} N = - \frac{1}{\nu} A^{-2} $ is the iteration matrix of the stationary method. Therefore our stationary method converges faster for $\nu $ rising, which is shown in \ref{sec:DampedJacobi}. For smaller $\nu$ we can expect slower or not even convergence at all, if the stationary method does not converge. 
+First we analyse \eqref{eq: stationaryMethod} and it's corresponding multigrid method. We expect that the convergence of our multigrid methods 
+gets better for rising $\nu$. Regarding the notation of the script $M^{-1} N = - \frac{1}{\nu} A^{-2} $ is the iteration matrix of the 
+stationary method. Therefore our stationary method converges faster for $\nu $ rising, which is shown in \ref{sec:DampedJacobi}. For smaller $
+\nu$ we can expect slower or not even convergence at all, if the stationary method does not converge. 
 
 
 \begin{figure}[h!]
@@ -298,13 +306,20 @@ First we analyse \eqref{eq: stationaryMethod} and it's corresponding multigrid m
 	\caption{Number of iterations of multigrid in comparison with the stationary method for different $\nu$ and $m$}
 	\label{fig: multigridStationary}
 \end{figure}
-Now let us check, if our predictions were right. From figure \ref{fig: multigridStationary} we can observe, that our multigrid method converges only for huge $\nu $. This can be explained by the fact, that our sationary method converges only for huge $\nu$. In this case the term $\nu \Id$ dominates $\nu \Id + A^{-2}$ and we get a iteration which would be similar to a jacobi one. As bigger $m$ gets, $\nu$ needs to grow faster to achieve this effect. Therefore our multigrid method is not independent of the size $m$, because our stationary method can stop converging for $m$ rising. Though provided that our multigrid method converges, it needs only a few iterations. In this case our method is extremly quick  
+Now let us check, if our predictions were right. From figure \ref{fig: multigridStationary} we can observe, that our multigrid method converges 
+only for huge $\nu $. This can be explained by the fact, that our sationary method converges only for huge $\nu$. In this case the term $\nu 
+\Id$ dominates $\nu \Id + A^{-2}$ and we get a iteration which would be similar to a jacobi one. As bigger $m$ gets, $\nu$ needs to grow faster 
+to achieve this effect. Therefore our multigrid method is not independent of the size $m$, because our stationary method can stop converging 
+for $m$ rising. Though provided that our multigrid method converges, it needs only a few iterations. In this case our method is extremly quick  
 
 
 %% ====================================================================
 
 \subsection{Damped Jacobi as Smoother}
-Now we want to analyse the multigrid method with damped jacobi as smoother. We set $\omega= 0.5$, so we go half the way of every step. Let's make some predictions what happens, if we run our multigrid method. First we expect, that the multigrid method will be faster for shrinking $\nu$ and slower for bigger $\nu$. Because of $I + \nu A^2$ is diagonal dominant for small $\nu$, and Jacobi converges for such systems. For rising $\nu$, we'll lose this effect. Nevertheless, $A^2$ is block tridiagonal:
+Now we want to analyse the multigrid method with damped jacobi as smoother. We set $\omega= 0.5$, so we go half the way of every step. Let's 
+make some predictions what happens, if we run our multigrid method. First we expect, that the multigrid method will be faster for shrinking $
+\nu$ and slower for bigger $\nu$. Because of $I + \nu A^2$ is diagonal dominant for small $\nu$, and Jacobi converges for such systems. For 
+rising $\nu$, we'll lose this effect. Nevertheless, $A^2$ is block tridiagonal:
 \begin{align*}
 A^2 &= (I \otimes T + T \otimes I)^2 \\
 &= 2  \cdot T \otimes T + T^2 \otimes \Id + \Id \otimes T^2 
@@ -317,10 +332,13 @@ That's why Jacobi should still produces reasonable results.
 	\label{fig: multigridJacobi}
 \end{figure}
 
-Again let's verify our predictions. In figure \ref{fig: multigridJacobi} we can see exactly, what we expected. Our method is great for solving problems with small $\nu$. Though for very small $\nu$ we come close to:
+Again let's verify our predictions. In figure \ref{fig: multigridJacobi} we can see exactly, what we expected. Our method is great for solving 
+problems with small $\nu$. Though for very small $\nu$ we come close to:
 \[
 \Id   \vec{v} = \vec{f}
 \] 
 and the solution isn't so meaningful.
-Moreover we can see, that the multigrid method converges slower for $\nu$ rising. So thats again, what we predicted. From figure \ref*{fig: multigridJacobi} we really see, that our multigrid method is independent of the size $m$. We are able to observe this phenomenon in nearly every row.
+Moreover we can see, that the multigrid method converges slower for $\nu$ rising. So thats again, what we predicted. From figure \ref*{fig: 
+multigridJacobi} we really see, that our multigrid method is independent of the size $m$. We are able to observe this phenomenon in nearly 
+every row.
 \end{document}
