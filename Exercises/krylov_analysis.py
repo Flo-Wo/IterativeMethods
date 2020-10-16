@@ -20,12 +20,13 @@ plt.close('all')
 # generate tikz picture from the plot
 import tikzplotlib
 
-def plot_convergenceRate():
+def plot_convergenceRate(use="factored"):
     plt.figure(figsize = (30, 20))
     #plt.suptitle(r"Convergence analysis of cg-method using different values of $m$ and $\nu$")
     j = 1
-    for k in range(4):
-        nu = 0.01 * 10**k
+    amount = 5
+    for k in range(amount):
+        nu = 0.001 * 10**k
         for l in range(4,7):
             # create test vectors to get the system behaviour
             m = 2**l-1
@@ -41,9 +42,11 @@ def plot_convergenceRate():
                 solver_poisson_factored_cg(u_guess, nu, y_d, f, m)
             x = np.arange(0, num_iters)
             x_factored = np.arange(0, num_iters_factored)
-            plt.subplot(4,3,j)
-            plt.semilogy(x, res, "r-", label="initial system")
-            plt.semilogy(x_factored, res_factored, "b-", label="factored system")
+            plt.subplot(amount,3,j)
+            if use == "factored":
+                plt.semilogy(x_factored, res_factored, "b-", label="factored system")
+            else:
+                plt.semilogy(x, res, "r-", label="initial system")
             plt.legend(loc="upper right")
             plt.ylabel("norm of residual")
             plt.xlabel("number of iterations")
@@ -52,31 +55,38 @@ def plot_convergenceRate():
     plt.tight_layout()
     plt.show()
 
-def plot_conditionNumber():
-    plt.figure(figsize = (15, 25))
+def plot_conditionNumber(use="factored"):
+    plt.figure(figsize = (10, 10))
     j = 1
     for l in range(4,7):
         cond = []
         cond_factored = []
         nu_values = []
         m = 2**l-1
-        for k in range(4):
-            nu = 0.01 * 10**k
+        for k in range(5):
+            nu = 0.001 * 10**k
             nu_values.append(nu)
-            cond.append(condition_number_normal(m, nu))
-            cond_factored.append(condition_number_factored(m, nu))
-        plt.subplot(2,4,j)
-        plt.semilogx(nu_values, cond,"r-", label="initial system")
-        plt.semilogx(nu_values, cond_factored,"b-", label="factored system")
+            if use == "factored":
+                cond_factored.append(condition_number_factored(m, nu))
+            else:
+                cond.append(condition_number_normal(m, nu))
+        #plt.subplot(2,5,j)
+        if use == "factored":
+            plt.semilogx(nu_values, cond_factored,"x-", label=r"$m =$ {}".format(m))
+        else:
+            plt.semilogx(nu_values, cond,"x-", label=r"$m =$ {}".format(m))
         plt.xticks(nu_values)
         plt.yscale("log")
         plt.legend(loc="upper right")
-        plt.title(r"$m =$ {}".format(m))
+        if use =="factored":    
+            plt.title("factored system")
+        else:
+            plt.title("initial system")
         plt.xlabel(r"values of $\nu$")
         plt.ylabel("condition number of the system")
         j+=1
     plt.tight_layout()
     plt.show()
  
-plot_convergenceRate()
-
+#plot_convergenceRate(use="unfactored")
+plot_conditionNumber(use="unfactored")

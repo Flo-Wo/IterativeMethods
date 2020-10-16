@@ -159,16 +159,16 @@ def get_system(m,nu):
     left_side : callable
         function representing the left-hand side of our equation
     """
-    A = fd_laplace(m,d=2)
+    #A = fd_laplace(m,d=2)
     # A_small = fd_laplace(m,d=1)
     # lam, V = np.linalg.eigh(A_small.toarray())
     eye_nu = nu*sparse.identity(m**2)
     lam, V = laplace_small_decomposition(m)
     def left_side(v):
-        sol = sparse.linalg.spsolve(A, v)
-        sol2 = sparse.linalg.spsolve(A, sol)
-        #sol = fast_poisson(V,V,lam,lam,v)
-        #sol2 = fast_poisson(V,V,lam,lam,sol)
+        #sol = sparse.linalg.spsolve(A, v)
+        #sol2 = sparse.linalg.spsolve(A, sol)
+        sol = fast_poisson(V,V,lam,lam,v)
+        sol2 = fast_poisson(V,V,lam,lam,sol)
         return(eye_nu.dot(v)+sol2)
     return(left_side)
 
@@ -430,13 +430,13 @@ def solver_stationary_fixedRight(u_guess,nu, right_side, m, maxIter=500, tol=1e-
     A = fd_laplace(m, d=2)
     
     while res >= tol and k < maxIter:
-        temp = sparse.linalg.spsolve(A, u_k)
+        #temp = sparse.linalg.spsolve(A, u_k)
         
-        #temp = fast_poisson(V, V, lam, lam, u_k)
+        temp = fast_poisson(V, V, lam, lam, u_k)
         
         # solve current iteration
-        #temp2 = fast_poisson(V, V, lam, lam, temp)
-        temp2 = sparse.linalg.spsolve(A, temp)
+        temp2 = fast_poisson(V, V, lam, lam, temp)
+        #temp2 = sparse.linalg.spsolve(A, temp)
         u_k = ((-1)*(1/nu) * temp2)+ 1/nu*right_side
         # update history of the residuals
         res = norm(operator(u_k) - right_side)
