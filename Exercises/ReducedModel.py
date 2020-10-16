@@ -92,6 +92,7 @@ def fd_laplace(m, d):
         eye = sparse.eye(m)
         # T = kron(T_1, I) + kron(I, T_1)
         T = sparse.kron(eye, T_bar) + sparse.kron(T_bar, eye)
+    # !!! maybe we have to multiply by minus one !!! (-1)*
     return(1/(h**2) * T)
 
 

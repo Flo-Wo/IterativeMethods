@@ -74,7 +74,7 @@ for $h>0$ small enough, such that
 \begin{equation*}
 A\vec{y}=\vec{f}+\vec{u}
 \end{equation*}
-is satisfied. Notice that we do not have any boundary conditions. One possible way of finding a solution is the so-called reduced approach: We consider $\vec{y}$ as a function of $\vec{u}$, therefore obtaining the problem
+is satisfied. Here $A = -\frac{1}{h^2}\cdot T$ where $T$ is the two-dimensional laplace matrix, as we will see later. Notice that we do not have any boundary conditions. One possible way of finding a solution is the so-called reduced approach: We consider $\vec{y}$ as a function of $\vec{u}$, therefore obtaining the problem
 \begin{equation*}
 \min\limits_{\vec{u}\in\Omega} \hat{J}(\vec{u}) := J(\vec{y}(\vec{u}),\vec{u}).
 \end{equation*}
@@ -237,39 +237,56 @@ construct our sparse matrices and use the \texttt{scipy.sparse.linalg.LinearOper
 equation. So in both cases the solution process is completely matrix-free.
 
 
-Looking at figure \ref{fig:CG-convergence}, we can see the  convergence behaviour of the two systems. In the plots $\nu$ ist getting bigger going from top to bottom and $m$ is getting bigger going from left to right.
+Looking at figure \ref{fig:CG-convergence-factored} and \ref{fig:CG-convergence-initial}, we can see the  convergence behaviour of the two systems. In the plots $\nu$ ist getting bigger going from top to bottom and $m$ is getting bigger going from left to right.
 \begin{figure}[h!]
 \centering
-\includegraphics[scale=0.52]{./imgs/CG_analysis}
-\caption{Convergence behaviour for different values of $m$ and $\nu$ using CG to solve the systems.
+\includegraphics[scale=0.52]{./imgs/CG_analysis_factored}
+\caption{Convergence behaviour for different values of $m$ and $\nu$ using CG to solve the factored systems.
 The x-axis is representing the number of iterations and the y-axis shows the norm of the residuals in the discretized norm.}
-\label{fig:CG-convergence}
+\label{fig:CG-convergence-factored}
 \end{figure}
-As you can directly see in the plots, the solution process of both systems is getting worse, as the size of the matrix increases. Meanwhile, the behaviour 
-regarding different values of $\nu$ is more interesting. While the convergence of the initial optimality systems solution is getting slower and slower if 
-$\nu$ increases, the convergence rate of the factored system is getting faster and faster. So the systems behave in an opposite way, regarding the size of 
+As you can directly see in the plots, the solution process of the factored system is getting worse, as the size of the matrix increases. The initial
+system seems to be quite stable regarding finer grids. Meanwhile, the behaviour  regarding different values of $\nu$ is more interesting. While the 
+convergence solving the factored system is getting worse if 
+$\nu$ increases, the convergence rate of the initial system is getting faster and faster. So the systems behave in an opposite way, regarding the size of 
 $\nu$.
 
-%% ====================================================================
-\subsection{Conditional Number}
-One can explain this, if we take a closer look at the conditon number of the systems for the upper combinations of $\nu$ and $m$. We can see this in 
-figure \ref{fig:CG-conditionNumber}.
 \begin{figure}[h!]
 \centering
-\includegraphics[scale=0.65]{./imgs/CG_conditionNumber}
-\caption{Condition numbers of both systems for different values of $m$ and $\nu$ represented in a double-logarithmic plot.}
-\label{fig:CG-conditionNumber}
+\includegraphics[scale=0.52]{./imgs/CG_analysis_initial}
+\caption{Convergence behaviour for different values of $m$ and $\nu$ using CG to solve the initial systems.
+The x-axis is representing the number of iterations and the y-axis shows the norm of the residuals in the discretized norm.}
+\label{fig:CG-convergence-initial}
+\end{figure}
+
+%% ====================================================================
+\subsection{Condition Number}
+One can explain this, if we take a closer look at the conditon number of the systems for the upper combinations of $\nu$ and $m$. We can see this in 
+figure \ref{fig:CG-conditionNumber-factored} and \ref{fig:CG-conditionNumber-initial}.
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.5]{./imgs/CG_conditionNumber_factored}
+\caption{Condition numbers of the factored system for different values of $m$ and $\nu$ represented in a double-logarithmic plot.}
+\label{fig:CG-conditionNumber-factored}
 \end{figure}
 The three plots of the condition number explain really good, why we get the upper type of convergence behaviour. While both condition numbers get overall
 bigger from left to right (so with increasing matrix size due to bigger $m$), one can clearly see in each of the plots that the systems have opposed 
 curves.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.5]{./imgs/CG_conditionNumber_initial}
+\caption{Condition numbers of the initial system for different values of $m$ and $\nu$ represented in a double-logarithmic plot. (We used small little 
+crosses to indicate that the three plots overlay.}
+\label{fig:CG-conditionNumber-initial}
+\end{figure}
 
 While the factored system \eqref{eq:factoredOptimalitySystem} is worse conditioned for bigger $\nu$, the condition number of the initial system 
 gets better the bigger $\nu$ is. Looking at the formulas \eqref{eq:normalOptimalitySystem} and \eqref{eq:factoredOptimalitySystem} this should now be 
 really obvious.
 In \eqref{eq:factoredOptimalitySystem} we factor our matrix $A^2$ by $\nu$, so the bigger $\nu$ is, the worse the condition number gets. In the initial 
 system \eqref{eq:normalOptimalitySystem} the identity matrix with factor $\nu$ dominates the diagonal of the left-hand side for bigger $\nu$. So the 
-condition number is getting better and better as $\nu$ increases.
+condition number is getting better as $\nu$ increases, as the system is getting more and more diagonal dominant.
 
 %% ====================================================================
 
