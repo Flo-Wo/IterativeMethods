@@ -651,6 +651,71 @@ def solver_damped_jacobi(A, u_guess, omega, f, maxIter,tol=1e-8, norm=()):
         res.append(resi_norm)
         k=k+1
     return(u_k, k, res)
+    
+def solver_damped_jacobi_mod(omega, nu, m, y_d, f, u_guess, maxIter,tol=1e-8, norm=()):
+    """
+    Function to solve a system 
+    
+        (nu*A^2 + I)u = A*y_d - f
+    
+    using the damped jacobi method
+
+    Parameters
+    ----------
+    A : ndarray/sparse matrix
+        matrix of the system
+    u_guess : ndarray
+        inital guess the algorithm should use to start with
+    omega : real number in (0,1)
+        damping parameter for the algorithm
+    f : ndarray
+        right-hand side of the system
+    maxIter : int
+        maximum number of iterations the algorithm should do
+    tol : positive real number, optional
+        tolerance the algorithm should use for the residuals.
+        The default is 1e-8.
+
+    Returns
+    -------
+    u : ndarray
+        solution for the system
+    k : integer
+        number of iterations needed
+    res : list
+        list with the history of the norm of the residuels
+
+    """
+    
+    if norm == ():
+        def norm(v):
+            return(np.linalg.norm(v))
+            
+    #get matrix nu*A^2 + I and right side
+    A_init = fd_laplace(m,2)
+    A = nu*A_init.dot(A_init) + sparse.diags(np.eye(m**2).diagonal())
+    f = A_init.dot(y_d) - f
+    # get diagonal matrix in csr form, to manipulate its entries
+    D_inverse = sparse.diags(1/(A.diagonal()),format="csr")
+    # get size of the matrix
+    m,m = D_inverse.shape
+    k = 1
+    # init empty history of the norm of the residuals
+    res = []
+    u_k = u_guess
+    resi = (f - A.dot(u_k))
+    resi_norm = norm(resi)
+    # get norm of the first residual
+    res.append(resi_norm)
+    while resi_norm >= tol and k < maxIter:
+        # one step of the damped jacobi 
+        u_k = u_k + omega* D_inverse.dot(resi)
+        # calculate the norm of the current residual
+        resi = f -  A.dot(u_k)
+        resi_norm = norm(resi)
+        res.append(resi_norm)
+        k=k+1
+    return(u_k, k, res)
 
 def vcycle_jac(nu, nu1, nu2, m, u_guess, f, level, omega):
     """
