@@ -107,7 +107,80 @@ def test_jacobi(nu_start, m, omega, plot="nu"):
         else:
             plt.semilogy(x,res, label="m = {}".format(m))
 
+def plot_stationary(m,nu,option):
+    """
+    Function to analyse the convergence of the initial optimality system 
+    
+        (nu * A^-2)u = A^-1 * y_d - A^-2 * f
+    
+    using the iteration process
+    
+        u_{n+1} = -1/nu A^{-2} u_n + 1/nu (A^-1*(y_d- A^-1 *f))
 
+    Parameters
+    ----------
+    m : positive int
+        size the matrix should have (for d=2 the matrix size is m**2 x m**2), 
+        regarding your desired discretization
+    nu : positive real number
+        regularization parameter of the optimal control problem
+    option : 1=nu, 2=m
+        choosing which parameter to modify
+
+    Returns
+    -------
+    Three subplots with different nu or m
+    
+    """    
+    plt.figure(figsize = (20, 20))
+    maxIter = 1000
+    tol = 1e-8
+    
+    #fixed m, modifying n
+    if option == 1:
+        #counter for subplots
+        j = 1
+        
+        for i in range(0,3):
+            #create test vectors
+            y_d = 10*np.ones(m**2)
+            u_guess = np.random.rand(m**2)
+            f = np.random.rand(m**2)
+            #using stationary method
+            nu = 10**(-(i+1))
+            u,k,res = solver_stationary(u_guess,nu, y_d, f, m, maxIter=1000, tol=1e-8)
+            #plotting
+            it = np.arange(0,k,1)
+            plt.subplot(1,3,j)
+            plt.semilogy(it,res, "r-",label="nu={}".format(nu))
+            plt.legend(loc="upper right")
+            plt.ylabel("norm of residual")
+            plt.xlabel("number of iterations")
+            plt.title(r"$m =$ {0}".format(m))
+            j += 1
+    
+    #fixed nu, modifying m
+    if option == 2:
+        #counter for subplots
+        j = 1
+        
+        for l in range(3,6):
+            m = 2**l-1
+            #create test vectors
+            y_d = 10*np.ones(m**2)
+            u_guess = np.random.rand(m**2)
+            f = np.random.rand(m**2)
+            #using stationary method
+            u,k,res = solver_stationary(u_guess,nu, y_d, f, m, maxIter=1000, tol=1e-8)
+            #plotting
+            it = np.arange(0,k,1)
+            plt.subplot(1,3,j)
+            plt.semilogy(it,res, "r-",label="m={}".format(m))
+            plt.legend(loc="upper right")
+            plt.ylabel("norm of residual")
+            plt.xlabel("number of iterations")
+            plt.title(r"$\nu =$ {0}".format(nu))
+            j += 1
 
 # # # #### Test multigrid jacobi
 
@@ -260,3 +333,12 @@ print("norm differences = {}".format(np.linalg.norm(u_sol - u_res)))
 # plt.plot(x, cond_compare, "bx-")
             
             
+# # ===============================
+# # Test initial system using stationary method, fixed m
+# # ===============================
+plot_stationary(m=15,nu=0.01,option=1)
+
+# # ===============================
+# # Test initial system using stationary method, fixed nu
+# # ===============================
+plot_stationary(m=15,nu=0.01,option=2)

@@ -45,7 +45,7 @@
 \email{thanh-van.huynh@uni-konstanz.de, michael.thiele@uni-konstanz.de, florian.2.wolf@uni-konstanz.de}
 \date{\today}
 
-%\dedicatory{Thanks Gabriele and Christian for your great work.}
+\dedicatory{Thanks Gabriele and Christian for your great work.}
 
 \begin{abstract}
 This is a report about the findings of Thanh-Van Huynh, Michael Thiele and Florian Wolf in the exercises accompanying Iterative Methods for Linear Systems. The lecture was held by Jun.-Prof. Dr. Gabriele Ciaramella with the assistance of Christian J\"ackle in the winter term 2020/21 at the University of Constance.
@@ -191,7 +191,18 @@ Now, we solve the system (\ref{eq:normalOptimalitySystem}) by the stationary ite
 \begin{equation}
 \vec{u}^{n+1} = -\frac{1}{\nu} A^{-2}\vec{u}^n + \frac{1}{\nu} A^{-1} (\vec{y}_d-A^{-1}\vec{f})
 \end{equation}
-and analyze its convergence behavior for different $m$ and $\nu$.
+and analyze its convergence behavior for different $m$ and $\nu$. First, we fix $\nu=0.01$, then $m=15$.
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=1.7]{./imgs/convergence_stationary}
+	\caption{Convergence behaviour of the stationary iteration for different values of $m$ and $\nu$}
+\end{figure}
+
+As the figure shows, large $m$ will lead to fast convergence. The same goes for $\nu$: bigger values are the key to convergence, while choosing small $\nu$ will result in divergence.
+
+%% ====================================================================
+
 \subsubsection{Eigenvectors and eigenvalues of the laplace matrices}
 As we have seen in the section regarding the stationary solver and we will see this again, if we consider solving \eqref{eq:normalOptimalitySystem} 
 using the conjugated gradient method, the poisson solver is the key, to get a fast solution to the $A^{-1}$ problem. The solver requires a decomposition
@@ -207,7 +218,8 @@ and the corresponding eigenvectors with entries
 \end{align*}
 Now we can include these manually to get a more exact and especially quicker solver.
 
-To get the eigenvectors and eigenvalues of the two-dimensional laplace matrix, we use problem 10 of REFERENCE TO THE BOOK and proof its third bullet 
+To get the eigenvectors and eigenvalues of the two-dimensional laplace matrix, we use problem 10 of the 
+stationary iterative methods chapter of the script and proof its third bullet 
 point. Therefore we use the formula $(A \otimes B)(C \otimes D) = (AC) \otimes (BD)$. For $j,k \in \{1, \ldots, m\}$ arbitrary we get for $\lambda := 
 \lambda_j + \lambda_k$ and $\vec{v} := \vec{v}_j \otimes \vec{v}_k$ that
 \begin{align*}
@@ -220,13 +232,32 @@ A\vec{v} &= \left(\text{I}_m \otimes T_1 + T_1 \otimes \text{I}_m \right) \vec{v
 Therefore the eigenvectors and eigenvalues of the two-dimensional laplace are obtained by using the kronecker product of the one-dimensional eigenvectors
 and summing up the one-dimensional eigenvalues. We will use the eigenvalues, to calculate the condition number of the matrix in the section
 about Krylov methods.
+
 %% ====================================================================
 
 \subsection{Damped Jacobi}
 \label{sec:DampedJacobi}
+Now we solve the system
+\begin{equation}
+(\nu A^2+ I) \vec{u} = A(\vec{y}_d-A^{-1}\vec{f}) = A\vec{y}_d-\vec{f}
+\end{equation}
+using the damped-Jacobi iteration
+\begin{equation}
+\vec{u}^{k+1} = \vec{u}^k + \omega D^{-1}\left(A \vec{y}_d-\vec{f}-(\nu A^2 + I)\vec{u}^k\right)
+\end{equation}
+with a damping parameter $\omega\in(0,1]$ and $D=\text{diag}(\nu A^2+I)$. Out of the three parameters $\omega=0.6, \nu=10^{-5}$ and $m=15$ we fix two and modify one in order to analyse the convergence behavior of th damped-Jacobi iteration.\\ \\
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=0.42]{./imgs/convergence_damped_jac}
+	\caption{Convergence behaviour of the damped-Jacobi iteration for different values of $\omega,\nu$ and $m$}
+\end{figure}
+As the  figure at the bottom shows, and after some trial-and-error, we observe that $\omega\approx0.5$ is the optimal choice to reach efficient convergence. For smaller $\omega$ damped-Jacobi still converges, but slower, and for $\omega\geq0.7$ we do not obtain convergence. The dimension of $\nu$ also has a great impact: as $\nu$ gets smaller, we start to converge. As for the value of $m$, choosing bigger $m$ will lead to divergence of the damped-Jacobi method.
+
 %% ====================================================================
+
 \newpage
 \section{Krylov Methods}
+
 %% ====================================================================
 
 \subsection{Convergence Analysis}
@@ -260,6 +291,7 @@ The x-axis is representing the number of iterations and the y-axis shows the nor
 \end{figure}
 
 %% ====================================================================
+
 \subsection{Condition Number}
 One can explain this, if we take a closer look at the conditon number of the systems for the upper combinations of $\nu$ and $m$. We can see this in 
 figure \ref{fig:CG-conditionNumber-factored} and \ref{fig:CG-conditionNumber-initial}.
@@ -310,6 +342,9 @@ dampedJacobi}, which is called damped Jacobi method with damping parameter $\ome
 stationaryMethod} and \eqref{eq: dampedJacobi} as smoothers in a multigrid method. In both multigrid methods we use the interpolation matrix $P
 $ and the full weighting restriction matrix $R:= \frac{1}{2} P^T$  in our coarse correction step. Furthermore we do three Pre-Smoothing and 
 three Post-Smoothing steps. 
+
+%% ====================================================================
+
 \subsection{Stationary Methods as Smoother}
 First we analyse \eqref{eq: stationaryMethod} and it's corresponding multigrid method. We expect that the convergence of our multigrid methods 
 gets better for rising $\nu$. Regarding the notation of the script $M^{-1} N = - \frac{1}{\nu} A^{-2} $ is the iteration matrix of the 
