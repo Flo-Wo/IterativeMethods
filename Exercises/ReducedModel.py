@@ -163,6 +163,7 @@ def get_system(m,nu):
     #A = fd_laplace(m,d=2)
     # A_small = fd_laplace(m,d=1)
     # lam, V = np.linalg.eigh(A_small.toarray())
+    #h=1/(m+1)
     eye_nu = nu*sparse.identity(m**2)
     lam, V = laplace_small_decomposition(m)
     def left_side(v):
@@ -170,7 +171,8 @@ def get_system(m,nu):
         #sol2 = sparse.linalg.spsolve(A, sol)
         sol = fast_poisson(V,V,lam,lam,v)
         sol2 = fast_poisson(V,V,lam,lam,sol)
-        return(eye_nu.dot(v)+sol2)
+        #return(eye_nu.dot(v)+((h**4))* sol2)
+        return(eye_nu.dot(v)+ sol2)
     return(left_side)
 
 
@@ -304,7 +306,7 @@ def condition_number_factored(m, nu):
     return(sol)
     
 
-def solver_stationary(u_guess,nu, y_d, f, m, maxIter=1000, tol=1e-8):
+def solver_stationary(u_guess,nu, y_d, f, m, maxIter=1000, tol=1e-14):
     """
     Function to use a stationary solver for the initial optimality system
     using the iteration process
@@ -375,7 +377,7 @@ def solver_stationary(u_guess,nu, y_d, f, m, maxIter=1000, tol=1e-8):
         
     return(u_k, k, res_list)
 
-def solver_stationary_fixedRight(u_guess,nu, right_side, m, maxIter=500, tol=1e-8):
+def solver_stationary_fixedRight(u_guess,nu, right_side, m, maxIter=500, tol=1e-14):
     """
     This is a method to use the iteration of the stationary solver for an
     arbtrary right-hand side of the equation. It is used to solve systems of
@@ -427,7 +429,7 @@ def solver_stationary_fixedRight(u_guess,nu, right_side, m, maxIter=500, tol=1e-
     # caclculate the first norm of the residual
     res = norm(operator(u_k) - right_side)
     res_list.append(res)
-    
+    res0=res
     A = fd_laplace(m, d=2)
     
     while res >= tol and k < maxIter:
@@ -441,7 +443,7 @@ def solver_stationary_fixedRight(u_guess,nu, right_side, m, maxIter=500, tol=1e-
         u_k = ((-1)*(1/nu) * temp2)+ 1/nu*right_side
         # update history of the residuals
         res = norm(operator(u_k) - right_side)
-        res_list.append(res)
+        res_list.append(res/res0)
         
         k+=1
         
@@ -591,7 +593,7 @@ def solver_poisson_factored_cg(u_guess, nu, y_d, f, m,tol=1e-8):
     
 
 
-def solver_damped_jacobi(A, u_guess, omega, f, maxIter,tol=1e-8, norm=()):
+def solver_damped_jacobi(A, u_guess, omega, f, maxIter,tol=1e-14, norm=()):
     """
     Function to solve a system 
     
@@ -851,7 +853,7 @@ def vcycle_stat(nu, nu1, nu2, m, u_guess, f, level):
         return(u_nu2, res_norm)
 
 
-def multigrid_stat(nu, f, u_guess, m, nu1, nu2, level, maxIter=50,tol=1e-12):
+def multigrid_stat(nu, f, u_guess, m, nu1, nu2, level, maxIter=50,tol=1e-10):
     """
     Function to run use multigrid as a solver with the stationary method as a 
     smoother. In this case we try to solve the initial system.
@@ -884,7 +886,6 @@ def multigrid_stat(nu, f, u_guess, m, nu1, nu2, level, maxIter=50,tol=1e-12):
 
     """
     norm = create_norm(m)
-    u_sol, res = vcycle_stat(nu, nu1, nu2, m, u_guess, f, level)
     u_sol=u_guess
     op = get_system(m,nu)
     C = LinearOperator((m**2,m**2),op)
@@ -892,7 +893,7 @@ def multigrid_stat(nu, f, u_guess, m, nu1, nu2, level, maxIter=50,tol=1e-12):
     res0 = res
     k = 1
     res_his = []
-    res_his.append(res/res0)
+    res_his.append(res)
     while res/res0 >= tol and k < maxIter and res <= 10e10:
         u_sol, res = vcycle_stat(nu, nu1, nu2, m, u_sol, f, level)
         k+=1

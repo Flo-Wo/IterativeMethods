@@ -27,9 +27,9 @@ def plot_mulitgrid_jacobi():
     nu2 = 3
     level = 3
     j=1
-    for i in range(0,2):    
+    for i in range(0,4):    
         nu= 0.01 * 10**i
-        for l in range(4,6):
+        for l in range(4,7):
             
             m = 2**l -1
             h = 1/(m+1)
@@ -73,9 +73,9 @@ def plot_mulitgrid_stat():
     nu2 = 2
     level = 3
     j=1
-    for i in range(0,1):    
-        nu= 1 * 10**i
-        for l in range(5,6):
+    for i in range(0,4):    
+        nu= 0.01 * 10**i
+        for l in range(4,7):
             
             m = 2**l -1
             
@@ -103,7 +103,7 @@ def plot_mulitgrid_stat():
                                                       nu1, nu2, level)
             print(res_stat)
             u_stat_m, k_stat_m, res_stat_m = solver_stationary_fixedRight(u_guess,nu,\
-                                                                          f_stat, m, maxIter=k_stat)
+                                                                          f_stat, m, maxIter=k_stat,tol=1e-6)
             x_stat = np.arange(0,k_stat)
             x_stat_m = np.arange(0,k_stat_m)
             
@@ -113,7 +113,7 @@ def plot_mulitgrid_stat():
             plt.semilogy(x_stat, res_stat, "b-", label=" mutlti-grid  {} levels ".format(level))
             plt.legend(loc="upper right")
             plt.title(r"$m =$ {0}, $\nu =$ {1}".format(m, nu))
-            plt.ylabel("norm of residual ")
+            plt.ylabel("normalized residual ")
             plt.xlabel("iterations")
             print("norm differences = {}".format(np.linalg.norm(u_sol - u_stat)))
             j= j + 1
