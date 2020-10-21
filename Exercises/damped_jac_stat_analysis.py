@@ -15,6 +15,43 @@ import matplotlib.pyplot as plt
 plt.close('all')
 
 
+def get_jac_iteration_matrix(m, nu, omega):
+    """
+    Fuction to generate the the iteration matrix solving the system
+    
+        (nu*A^2 + I)*u = A (y_d + A^{-1}*f) = A*y_d - f
+        
+    by using damped Jacobi
+
+    Parameters
+    ----------
+    m : positive int
+        size the matrix should have (for d=2 the matrix size is m**2 x m**2), 
+        regarding your desired discretization
+    nu : positive real number
+        regularization parameter of the optimal control problem
+    omega : real number between 0 and 1
+        danping parameter of the damped Jacobi iteration
+
+    Returns
+    -------
+    Norm of the iteration matrix using damped Jacobi
+
+    """
+    A = fd_laplace(m,2).toarray()
+    n = m**2
+    A_2 = A.dot(A)
+    System = np.eye(n)+ nu*A_2
+    D = np.diag(np.diag(System))
+    D_inv = omega * np.linalg.inv(D)
+    It_matrix = D_inv.dot((1/omega)*D-System)
+    lam, V = np.linalg.eig(It_matrix)
+    lam = np.abs(lam)
+    idx = lam.argsort()
+    lam = lam[idx]
+    V = V[:,idx]
+    return(lam, V)
+
 def get_norm_jac_iteration_matrix(m,nu,omega):
     """
     Fuction to generate the norm of the iteration matrix solving the system
@@ -263,9 +300,27 @@ def plot_damped_jac(omega,m,nu,option):
             j += 1
 
 #test
-for i in range(1,4):
-    plot_damped_jac(omega=0.6,m=15,nu=0.00001,option=i)
+# for i in range(1,4):
+#     plot_damped_jac(omega=0.6,m=15,nu=0.00001,option=i)
 
-plot_norm_iteration_matrix_jac()
-plot_norm_iteration_matrix_stat()
+#plot_norm_iteration_matrix_jac()
+#plot_norm_iteration_matrix_stat()
 #plot_norm_iteration_matrix_stat_jac()
+
+
+def print_eigenvector(m, nu, omega, index):
+    lam, V = get_jac_iteration_matrix(m, nu, omega)
+    print(lam)
+    vector = np.reshape(V[:,index], (m,m))
+    X = np.arange(0, m)
+    Y = X
+    XX, YY = np.meshgrid(X,Y)
+    plt.contourf(XX,YY,vector)
+    plt.show()
+m = 15
+nu = 0.1
+omega = 2/3
+index = -4
+
+print_eigenvector(m, nu, omega, index)
+
