@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2016.4.23)  21 OCT 2020 20:05
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2016.4.23)  21 OCT 2020 20:11
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -447,13 +447,13 @@ Package pdftex.def Info: ./imgs/convergence_stationary.png used on input line 1
 98.
 (pdftex.def)             Requested size: 481.60521pt x 312.0605pt.
  [3 <./imgs/convergence_stationary.png>] <./imgs/convergence_damped_jac.png, id
-=96, 1188.44pt x 1150.2975pt>
+=96, 283.2984pt x 407.8437pt>
 File: ./imgs/convergence_damped_jac.png Graphic file (type png)
 
 <use ./imgs/convergence_damped_jac.png>
 Package pdftex.def Info: ./imgs/convergence_damped_jac.png used on input line 2
 51.
-(pdftex.def)             Requested size: 499.1414pt x 483.12166pt.
+(pdftex.def)             Requested size: 436.27655pt x 628.07501pt.
 
 Underfull \hbox (badness 10000) in paragraph at lines 247--255
 
@@ -462,7 +462,16 @@ Underfull \hbox (badness 10000) in paragraph at lines 247--255
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-[4] <./imgs/CG_analysis_factored.png, id=110, 977.8131pt x 651.1527pt>
+[4]
+
+LaTeX Warning: Text page 5 contains only floats.
+
+
+Overfull \vbox (4.86047pt too high) has occurred while \output is active []
+
+
+[5 <./imgs/convergence_damped_jac.png>]
+<./imgs/CG_analysis_factored.png, id=116, 977.8131pt x 651.1527pt>
 File: ./imgs/CG_analysis_factored.png Graphic file (type png)
 
 <use ./imgs/CG_analysis_factored.png>
@@ -474,11 +483,7 @@ Overfull \hbox (7.98174pt too wide) in paragraph at lines 274--276
  [][] 
  []
 
-
-LaTeX Warning: `!h' float specifier changed to `!ht'.
-
-[5 <./imgs/convergence_damped_jac.png>]
-<./imgs/CG_analysis_initial.png, id=120, 977.8131pt x 651.1527pt>
+<./imgs/CG_analysis_initial.png, id=117, 977.8131pt x 651.1527pt>
 File: ./imgs/CG_analysis_initial.png Graphic file (type png)
 
 <use ./imgs/CG_analysis_initial.png>
@@ -493,7 +498,7 @@ Overfull \hbox (7.98174pt too wide) in paragraph at lines 287--289
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-<./imgs/CG_conditionNumber_factored.png, id=123, 722.7pt x 504.4446pt>
+<./imgs/CG_conditionNumber_factored.png, id=120, 722.7pt x 504.4446pt>
 File: ./imgs/CG_conditionNumber_factored.png Graphic file (type png)
 
 <use ./imgs/CG_conditionNumber_factored.png>
@@ -504,7 +509,7 @@ ine 300.
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-<./imgs/CG_conditionNumber_initial.png, id=124, 722.7pt x 504.4446pt>
+<./imgs/CG_conditionNumber_initial.png, id=121, 722.7pt x 504.4446pt>
 File: ./imgs/CG_conditionNumber_initial.png Graphic file (type png)
 
 <use ./imgs/CG_conditionNumber_initial.png>
@@ -516,33 +521,33 @@ ne 310.
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
 [6 <./imgs/CG_analysis_factored.png>]
-<./imgs/multigrid_stat_comparison_tiny.png, id=151, 1184.425pt x 1153.30875pt>
+<./imgs/multigrid_stat_comparison_tiny.png, id=150, 1184.425pt x 1153.30875pt>
 File: ./imgs/multigrid_stat_comparison_tiny.png Graphic file (type png)
 
 <use ./imgs/multigrid_stat_comparison_tiny.png>
 Package pdftex.def Info: ./imgs/multigrid_stat_comparison_tiny.png used on inpu
 t line 357.
 (pdftex.def)             Requested size: 473.76161pt x 461.31532pt.
-
+ [7 <./imgs/CG_analysis_initial.png>]
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-[7 <./imgs/CG_analysis_initial.png>]
-<./imgs/multigrid_jac_comparison_tiny.png, id=164, 1180.41pt x 1153.30875pt>
+[8 <./imgs/CG_conditionNumber_factored.png> <./imgs/CG_conditionNumber_initial.
+png>]
+<./imgs/multigrid_jac_comparison_tiny.png, id=169, 1180.41pt x 1153.30875pt>
 File: ./imgs/multigrid_jac_comparison_tiny.png Graphic file (type png)
 
 <use ./imgs/multigrid_jac_comparison_tiny.png>
 Package pdftex.def Info: ./imgs/multigrid_jac_comparison_tiny.png used on input
  line 382.
 (pdftex.def)             Requested size: 472.15564pt x 461.31532pt.
- [8 <./imgs/CG_conditionNumber_factored.png> <./imgs/CG_conditionNumber_initial
-.png>]
+
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
+[9 <./imgs/multigrid_stat_comparison_tiny.png>]
 Package atveryend Info: Empty hook `BeforeClearDocument' on input line 396.
-[9 <./imgs/multigrid_stat_comparison_tiny.png>] [10 <./imgs/multigrid_jac_compa
-rison_tiny.png>]
+ [10 <./imgs/multigrid_jac_comparison_tiny.png>]
 Package atveryend Info: Empty hook `AfterLastShipout' on input line 396.
  (./ReducedApproachReport.aux)
 Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 396.
@@ -578,7 +583,7 @@ texmf-dist/fonts/type1/public/amsfonts/cm/cmti8.pfb></usr/local/texlive/2015/te
 xmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2015/tex
 mf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb></usr/local/texlive/2015/texmf
 -dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on ReducedApproachReport.pdf (10 pages, 836304 bytes).
+Output written on ReducedApproachReport.pdf (10 pages, 880585 bytes).
 PDF statistics:
  261 PDF objects out of 1000 (max. 8388607)
  211 compressed objects within 3 object streams

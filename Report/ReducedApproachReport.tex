@@ -248,7 +248,7 @@ using the damped-Jacobi iteration
 with a damping parameter $\omega\in(0,1]$ and $D=\text{diag}(\nu A^2+I)$. Out of the three parameters $\omega=0.6, \nu=10^{-5}$ and $m=15$ we fix two and modify one in order to analyse the convergence behavior of th damped-Jacobi iteration.\\ \\
 \begin{figure}[h!]
 	\centering
-	\includegraphics[scale=0.42]{./imgs/convergence_damped_jac}
+	\includegraphics[scale=1.54]{./imgs/convergence_damped_jac}
 	\caption{Convergence behaviour of the damped-Jacobi iteration for different values of $\omega,\nu$ and $m$}
 \end{figure}
 As the  figure at the bottom shows, and after some trial-and-error, we observe that $\omega\approx0.5$ is the optimal choice to reach efficient convergence. For smaller $\omega$ damped-Jacobi still converges, but slower, and for $\omega\geq0.7$ we do not obtain convergence. The dimension of $\nu$ also has a great impact: as $\nu$ gets smaller, we start to converge. As for the value of $m$, choosing bigger $m$ will lead to divergence of the damped-Jacobi method.
