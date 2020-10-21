@@ -719,7 +719,7 @@ def solver_damped_jacobi_mod(omega, nu, m, y_d, f, u_guess, maxIter,tol=1e-8, no
         k=k+1
     return(u_k, k, res)
 
-def vcycle_jac(nu, nu1, nu2, m, u_guess, f, level, omega):
+def vcycle_jac(C,nu, nu1, nu2, m, u_guess, f, level, omega):
     """
     Function to run one vcycle of the multigrid method using jacobi as a
     smoother. In this case we try to solve the initial system.
@@ -755,9 +755,10 @@ def vcycle_jac(nu, nu1, nu2, m, u_guess, f, level, omega):
     norm = create_norm(m)
     #h = 1/(m+1)
     # construct matrix to get the right-hand side of the system
-    A = fd_laplace(m, d=2)
-    A_2 = np.dot(A,A)
-    C = sparse.eye((m**2)) + nu * A_2
+    #A = fd_laplace(m, d=2)
+    
+    #A_2 = np.dot(A,A)
+    #C = sparse.eye((m**2)) + nu * A_2
     # save omega for the recursion
     if level == 1:
         # on the last level the system gets solved with the build-in solver
@@ -782,7 +783,9 @@ def vcycle_jac(nu, nu1, nu2, m, u_guess, f, level, omega):
         ## init with zero vector
         u_init = np.zeros(m_new**2)
         
-        u_temp, _ = vcycle_jac(nu, nu1, nu2, m_new, u_init, f_new, level-1, omega)
+        CH=np.dot(P,np.dot(C,R))
+        
+        u_temp, _ = vcycle_jac(CH,nu, nu1, nu2, m_new, u_init, f_new, level-1, omega)
         # project the current solution into the higher dimensional space
         u_new = u_nu1 + P.dot(u_temp)
         ### POST-SMOOTHING        
@@ -791,7 +794,7 @@ def vcycle_jac(nu, nu1, nu2, m, u_guess, f, level, omega):
         return(u_nu2, res_norm)
 
 
-def multigrid_jacobi(nu, f, u_guess, m, omega, nu1, nu2, level,maxIter=1000, tol=1e-6):
+def multigrid_jacobi(C,nu, f, u_guess, m, omega, nu1, nu2, level,maxIter=1000, tol=1e-6):
     """
     Function to run use multigrid as a solver with damped jacobi as a 
     smoother. In this case we try to solve the initial system.
@@ -829,9 +832,9 @@ def multigrid_jacobi(nu, f, u_guess, m, omega, nu1, nu2, level,maxIter=1000, tol
     u_sol = u_guess
     k = 1
     #h = 1/(m+1)
-    A = fd_laplace(m, d=2)
-    A_2 = np.dot(A,A)
-    C = sparse.eye((m**2)) + nu * A_2
+    #A = fd_laplace(m, d=2)
+    #A_2 = np.dot(A,A)
+    #C = sparse.eye((m**2)) + nu * A_2
     u_sol=u_guess
     #f_new = f
     res_his = []
@@ -839,7 +842,7 @@ def multigrid_jacobi(nu, f, u_guess, m, omega, nu1, nu2, level,maxIter=1000, tol
     res_his.append(res)
     res0=res
     while res/res0 >= tol and k < maxIter  and res <= 10e10:
-        u_temp, res = vcycle_jac(nu, nu1, nu2, m, u_sol, f, level, omega)
+        u_temp, res = vcycle_jac(C,nu, nu1, nu2, m, u_sol, f, level, omega)
         u_sol = u_temp
         #f_new = f - C.dot(u_sol)
         res_his.append(res/res0)

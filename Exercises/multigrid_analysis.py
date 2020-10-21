@@ -23,13 +23,14 @@ def plot_mulitgrid_jacobi():
     omega = 0.5
     plt.figure(figsize = (20, 20))
     #plt.suptitle(r"Using multigrid to solve the system $(\ nu \cdot A^2+  I )v = f$ with dampeed jacobi with damping parameter $\omega =$ {}   and  comparing this to the convergence of the smoother as a stationary method".format(omega))
-    nu1 = 1
-    nu2 = 1
+    ############# important nu1 = 2 is essentially one step since we break after nu-1 iterations
+    nu1 = 2
+    nu2 = 2
     level = 3
     j=1
     for i in range(0,4):    
         nu= 0.01 * 10**i
-        for l in range(5,7):
+        for l in range(4,7):
             
             m = 2**l -1
             #h = 1/(m+1)
@@ -43,9 +44,9 @@ def plot_mulitgrid_jacobi():
             
             f =  S_jacobi.dot(u_sol)
             
-            u_jac, res_jac, k_jac = multigrid_jacobi(nu, f, u_guess, m, omega, \
+            u_jac, res_jac, k_jac = multigrid_jacobi(S_jacobi,nu, f, u_guess, m, omega, \
                                                      nu1, nu2, level)
-            (u_jac_m, k_jac_m, res_jac_m)= solver_damped_jacobi(A, u_guess, omega, f, maxIter=k_jac,tol=1e-6)
+            (u_jac_m, k_jac_m, res_jac_m)= solver_damped_jacobi(S_jacobi, u_guess, omega, f, maxIter=k_jac,tol=1e-6)
             
             x_jac=np.arange(0, k_jac)
             x_jac_m=np.arange(0, k_jac_m)
@@ -54,7 +55,7 @@ def plot_mulitgrid_jacobi():
             plt.semilogy(x_jac, res_jac, "b-", label="multigrid with {} levels".format(level))
             plt.semilogy(x_jac_m, res_jac_m, "r-", label="damped jacobi")
             plt.legend(loc="upper right")
-            plt.ylabel("norm of residual ")
+            plt.ylabel("normalized residual ")
             plt.xlabel("iterations")
             plt.title(r"$m =$ {0}, $\nu =$ {1}".format(m, nu))
             print("norm differences = {}".format(np.linalg.norm(u_sol - u_jac)))
@@ -97,7 +98,7 @@ def plot_mulitgrid_stat():
             # op = get_system(m,nu)
             
             # S_stat = LinearOperator((m**2,m**2),op)
-            # f_stat = S_stat(u_sol)
+            f#_stat = S_stat(u_sol)
             
             u_stat, res_stat, k_stat = multigrid_stat(nu, f_stat, u_guess, m, \
                                                       nu1, nu2, level)
@@ -152,7 +153,7 @@ def multigrid_vs_sparse():
     time=timeit.timeit("multi_sol()", setup="from multigrid_analysis import multi_sol")
     print(time)
 #multigrid_vs_sparse()
-plot_mulitgrid_jacobi()
-#plot_mulitgrid_stat()
+#plot_mulitgrid_jacobi()
+plot_mulitgrid_stat()
 
 
