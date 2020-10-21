@@ -88,5 +88,5 @@ def plot_conditionNumber(use="factored"):
     plt.tight_layout()
     plt.show()
  
-plot_convergenceRate(use="unfactored")
+plot_convergenceRate(use="factored")
 #plot_conditionNumber(use="unfactored")

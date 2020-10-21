@@ -46,7 +46,7 @@ def plot_mulitgrid_jacobi():
             
             u_jac, res_jac, k_jac = multigrid_jacobi(S_jacobi,nu, f, u_guess, m, omega, \
                                                      nu1, nu2, level)
-            (u_jac_m, k_jac_m, res_jac_m)= solver_damped_jacobi(S_jacobi, u_guess, omega, f, maxIter=k_jac,tol=1e-6)
+            (u_jac_m, k_jac_m, res_jac_m)= solver_damped_jacobi(S_jacobi, u_guess, omega, f, maxIter=k_jac)
             
             x_jac=np.arange(0, k_jac)
             x_jac_m=np.arange(0, k_jac_m)
@@ -104,7 +104,7 @@ def plot_mulitgrid_stat():
                                                       nu1, nu2, level)
             print(res_stat)
             u_stat_m, k_stat_m, res_stat_m = solver_stationary_fixedRight(u_guess,nu,\
-                                                                          f_stat, m, maxIter=k_stat,tol=1e-6)
+                                                                          f_stat, m, maxIter=k_stat)
             x_stat = np.arange(0,k_stat)
             x_stat_m = np.arange(0,k_stat_m)
             

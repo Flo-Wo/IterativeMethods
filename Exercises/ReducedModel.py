@@ -306,7 +306,7 @@ def condition_number_factored(m, nu):
     return(sol)
     
 
-def solver_stationary(u_guess,nu, y_d, f, m, maxIter=1000, tol=1e-14):
+def solver_stationary(u_guess,nu, y_d, f, m, maxIter=1000, tol=1e-12):
     """
     Function to use a stationary solver for the initial optimality system
     using the iteration process
@@ -377,7 +377,7 @@ def solver_stationary(u_guess,nu, y_d, f, m, maxIter=1000, tol=1e-14):
         
     return(u_k, k, res_list)
 
-def solver_stationary_fixedRight(u_guess,nu, right_side, m, maxIter=500, tol=1e-14):
+def solver_stationary_fixedRight(u_guess,nu, right_side, m, maxIter=500, tol=1e-12):
     """
     This is a method to use the iteration of the stationary solver for an
     arbtrary right-hand side of the equation. It is used to solve systems of
@@ -449,7 +449,7 @@ def solver_stationary_fixedRight(u_guess,nu, right_side, m, maxIter=500, tol=1e-
         
     return(u_k, k, res_list)
 
-def solver_poisson_unfactored_cg(u_guess, nu, y_d, f, m, tol=1e-8):
+def solver_poisson_unfactored_cg(u_guess, nu, y_d, f, m, tol=1e-12):
     """
     Method to solve the initial optimality system 
     
@@ -518,7 +518,7 @@ def solver_poisson_unfactored_cg(u_guess, nu, y_d, f, m, tol=1e-8):
     return(u, info, num_iters, res)
 
         
-def solver_poisson_factored_cg(u_guess, nu, y_d, f, m,tol=1e-8):
+def solver_poisson_factored_cg(u_guess, nu, y_d, f, m,tol=1e-12):
     """
     Method to solve the factored optimality system 
     
@@ -593,7 +593,7 @@ def solver_poisson_factored_cg(u_guess, nu, y_d, f, m,tol=1e-8):
     
 
 
-def solver_damped_jacobi(A, u_guess, omega, f, maxIter,tol=1e-14, norm=()):
+def solver_damped_jacobi(A, u_guess, omega, f, maxIter,tol=1e-12, norm=()):
     """
     Function to solve a system 
     
@@ -654,7 +654,7 @@ def solver_damped_jacobi(A, u_guess, omega, f, maxIter,tol=1e-14, norm=()):
         k=k+1
     return(u_k, k, res)
     
-def solver_damped_jacobi_mod(omega, nu, m, y_d, f, u_guess, maxIter,tol=1e-8, norm=()):
+def solver_damped_jacobi_mod(omega, nu, m, y_d, f, u_guess, maxIter,tol=1e-12, norm=()):
     """
     Function to solve a system 
     
@@ -794,7 +794,7 @@ def vcycle_jac(C,nu, nu1, nu2, m, u_guess, f, level, omega):
         return(u_nu2, res_norm)
 
 
-def multigrid_jacobi(C,nu, f, u_guess, m, omega, nu1, nu2, level,maxIter=1000, tol=1e-6):
+def multigrid_jacobi(C,nu, f, u_guess, m, omega, nu1, nu2, level,maxIter=100, tol=1e-12):
     """
     Function to run use multigrid as a solver with damped jacobi as a 
     smoother. In this case we try to solve the initial system.
@@ -921,7 +921,7 @@ def vcycle_stat(nu, nu1, nu2, m, u_guess, f, level):
         return(u_nu2, res_norm)
 
 
-def multigrid_stat(nu, f, u_guess, m, nu1, nu2, level, maxIter=50,tol=1e-10):
+def multigrid_stat(nu, f, u_guess, m, nu1, nu2, level, maxIter=50,tol=1e-12):
     """
     Function to run use multigrid as a solver with the stationary method as a 
     smoother. In this case we try to solve the initial system.
