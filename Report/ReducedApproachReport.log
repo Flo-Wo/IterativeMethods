@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2016.4.23)  21 OCT 2020 20:11
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2016.4.23)  21 OCT 2020 20:46
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -554,6 +554,10 @@ Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 396.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 396.
 Package rerunfilecheck Info: File `ReducedApproachReport.out' has not changed.
 (rerunfilecheck)             Checksum: 3E3E5BDD4019B67082035F4918EBADF2;205.
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 396.
  ) 
 Here is how much of TeX's memory you used:
@@ -583,7 +587,7 @@ texmf-dist/fonts/type1/public/amsfonts/cm/cmti8.pfb></usr/local/texlive/2015/te
 xmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2015/tex
 mf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb></usr/local/texlive/2015/texmf
 -dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on ReducedApproachReport.pdf (10 pages, 880585 bytes).
+Output written on ReducedApproachReport.pdf (10 pages, 880586 bytes).
 PDF statistics:
  261 PDF objects out of 1000 (max. 8388607)
  211 compressed objects within 3 object streams
