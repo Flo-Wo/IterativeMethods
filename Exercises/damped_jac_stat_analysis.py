@@ -266,6 +266,6 @@ def plot_damped_jac(omega,m,nu,option):
 for i in range(1,4):
     plot_damped_jac(omega=0.6,m=15,nu=0.00001,option=i)
 
-#plot_norm_iteration_matrix_jac()
-#plot_norm_iteration_matrix_stat()
+plot_norm_iteration_matrix_jac()
+plot_norm_iteration_matrix_stat()
 #plot_norm_iteration_matrix_stat_jac()

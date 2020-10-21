@@ -753,13 +753,12 @@ def vcycle_jac(nu, nu1, nu2, m, u_guess, f, level, omega):
     """
     
     norm = create_norm(m)
-    h = 1/(m+1)
+    #h = 1/(m+1)
     # construct matrix to get the right-hand side of the system
     A = fd_laplace(m, d=2)
     A_2 = np.dot(A,A)
     C = sparse.eye((m**2)) + nu * A_2
     # save omega for the recursion
-    omega_temp = omega
     if level == 1:
         # on the last level the system gets solved with the build-in solver
         u_sol = sparse.linalg.spsolve(C, f)
@@ -767,7 +766,7 @@ def vcycle_jac(nu, nu1, nu2, m, u_guess, f, level, omega):
         return(u_sol, res_norm)
     else:
         ### PRE-SMOOTHING
-        u_nu1,_ ,_ = solver_damped_jacobi(C, u_guess, omega_temp, f, nu1, norm=norm)
+        u_nu1,_,test = solver_damped_jacobi(C, u_guess, omega, f, nu1, norm=norm)
         ### RECURSION
         # restriction matrix (full weighted restriction matrix) to get
         # the smaller system
@@ -783,7 +782,7 @@ def vcycle_jac(nu, nu1, nu2, m, u_guess, f, level, omega):
         ## init with zero vector
         u_init = np.zeros(m_new**2)
         
-        u_temp, _ = vcycle_jac(nu, nu1, nu2, m_new, u_init, f_new, level-1, omega_temp)
+        u_temp, _ = vcycle_jac(nu, nu1, nu2, m_new, u_init, f_new, level-1, omega)
         # project the current solution into the higher dimensional space
         u_new = u_nu1 + P.dot(u_temp)
         ### POST-SMOOTHING        
@@ -829,20 +828,21 @@ def multigrid_jacobi(nu, f, u_guess, m, omega, nu1, nu2, level,maxIter=1000, tol
     norm = create_norm(m)
     u_sol = u_guess
     k = 1
-    h = 1/(m+1)
+    #h = 1/(m+1)
     A = fd_laplace(m, d=2)
     A_2 = np.dot(A,A)
     C = sparse.eye((m**2)) + nu * A_2
     u_sol=u_guess
-    f_new = f
+    #f_new = f
     res_his = []
     res = norm( f - C.dot(u_sol)) 
     res_his.append(res)
-    while res >= tol and k < maxIter  and res <= 10e10:
-        u_temp, res = vcycle_jac(nu, nu1, nu2, m, u_sol, f_new, level, omega)
-        u_sol = u_sol + u_temp
-        f_new = f - C.dot(u_sol)
-        res_his.append(res)
+    res0=res
+    while res/res0 >= tol and k < maxIter  and res <= 10e10:
+        u_temp, res = vcycle_jac(nu, nu1, nu2, m, u_sol, f, level, omega)
+        u_sol = u_temp
+        #f_new = f - C.dot(u_sol)
+        res_his.append(res/res0)
         k+=1
     return(u_sol, res_his, k)
 

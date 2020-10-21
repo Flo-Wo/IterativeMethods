@@ -20,19 +20,19 @@ plt.close('all')
 # =============================================================================
 
 def plot_mulitgrid_jacobi():
-    omega = 2/3
+    omega = 0.5
     plt.figure(figsize = (20, 20))
     #plt.suptitle(r"Using multigrid to solve the system $(\ nu \cdot A^2+  I )v = f$ with dampeed jacobi with damping parameter $\omega =$ {}   and  comparing this to the convergence of the smoother as a stationary method".format(omega))
-    nu1 = 3
-    nu2 = 3
+    nu1 = 1
+    nu2 = 1
     level = 3
     j=1
     for i in range(0,4):    
         nu= 0.01 * 10**i
-        for l in range(4,7):
+        for l in range(5,7):
             
             m = 2**l -1
-            h = 1/(m+1)
+            #h = 1/(m+1)
             A = fd_laplace(m,2)
             
             u_sol = np.random.rand(m**2)
@@ -152,7 +152,7 @@ def multigrid_vs_sparse():
     time=timeit.timeit("multi_sol()", setup="from multigrid_analysis import multi_sol")
     print(time)
 #multigrid_vs_sparse()
-#plot_mulitgrid_jacobi()
-plot_mulitgrid_stat()
+plot_mulitgrid_jacobi()
+#plot_mulitgrid_stat()
 
 
