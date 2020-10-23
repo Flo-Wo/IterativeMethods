@@ -9,9 +9,11 @@ import numpy as np
 from scipy.sparse.linalg import LinearOperator
 from ReducedModel import fd_laplace, condition_number_factored, condition_number_normal,\
     multigrid_jacobi, get_system, multigrid_stat,solver_stationary_fixedRight,solver_damped_jacobi\
-    ,laplace_eigs, solver_damped_jacobi_mod
+    ,laplace_eigs#, solver_damped_jacobi_mod
 from scipy import sparse
 import matplotlib.pyplot as plt
+from matplotlib import cm
+from mpl_toolkits.mplot3d import Axes3D
 plt.close('all')
 
 
@@ -115,6 +117,38 @@ def get_norm_stat_iteration_matrix(m,nu):
     max_ev= (1/ min_ev)
     norm= (1/nu )* max_ev 
     return norm
+
+def get_stat_iteration_matrix(m, nu):
+    """
+    Fuction to generate the the iteration matrix solving the system
+    
+        (nu*A^2 + I)*u = A (y_d + A^{-1}*f) = A*y_d - f
+        
+    by using damped Jacobi
+
+    Parameters
+    ----------
+    m : positive int
+        size the matrix should have (for d=2 the matrix size is m**2 x m**2), 
+        regarding your desired discretization
+    nu : positive real number
+        regularization parameter of the optimal control problem
+    omega : real number between 0 and 1
+        danping parameter of the damped Jacobi iteration
+
+    Returns
+    -------
+    Norm of the iteration matrix using damped Jacobi
+
+    """
+    lam,V = laplace_eigs(m)
+    lam = lam**2
+    lam=1/(lam)*(1/nu)
+    idx = lam.argsort()
+    lam = lam[idx]
+    V = V[:,idx]
+    return(lam, V)
+
 
 def plot_norm_iteration_matrix_jac():
     plt.figure(figsize = (15, 15))
@@ -315,12 +349,66 @@ def print_eigenvector(m, nu, omega, index):
     X = np.arange(0, m)
     Y = X
     XX, YY = np.meshgrid(X,Y)
+    plt.figure(figsize = (10, 10))
+    cp=plt.contourf(XX,YY,vector)
+    plt.xlabel("absolute eigenvalue={0:7.4f}".format(lam[index]))
+    plt.colorbar(cp)
+    plt.title(r'{0}-th eigenvector of damped jacobi iterationmatrix with $\nu$ = {1}'.format(-index,nu))
+    fig = plt.figure()
+    ax = fig.gca(projection='3d' )
+    ax.plot_surface(X, Y, vector,cmap=cm.coolwarm )
+    #Axes3D.plot_surface(X,Y,vector)
+
+    fig = plt.figure()
+    ax = fig.gca(projection='3d' )
+    ax.contour3D(X, Y, vector,cmap=cm.coolwarm )
     plt.contourf(XX,YY,vector)
     plt.show()
-m = 15
-nu = 0.1
-omega = 2/3
-index = -4
 
-print_eigenvector(m, nu, omega, index)
+def print_eigenvector_stat(m, nu,index):
+    lam, V = get_stat_iteration_matrix(m, nu)
+    print(lam)
+    vector = np.reshape(V[:,index], (m,m))
+    X = np.arange(0, m)
+    Y = X
+    XX, YY = np.meshgrid(X,Y)
+    plt.figure(figsize = (10, 10))
+    cp=plt.contourf(XX,YY,vector)
+    plt.xlabel("absolute eigenvalue={0:7.4f}".format(lam[index]))
+    plt.colorbar(cp)
+    plt.title(r'{0}-th eigenvector of the given stationary iterationmatrix with $\nu$ = {1} '.format(-index,nu))
+    #fig = plt.figure()
+    #ax = fig.gca(projection='3d' )
+    #ax.plot_surface(X, Y, vector,cmap=cm.coolwarm )
+    #Axes3D.plot_surface(X,Y,vector)
+
+    #fig = plt.figure()
+    #ax = fig.gca(projection='3d' )
+    #ax.contour3D(X, Y, vector,cmap=cm.coolwarm )
+    #plt.contourf(XX,YY,vector)
+    plt.show()
+
+def plot_eigenvector_stat_jac():
+    m=31
+    for i in range(0,3):
+        nu=0.01*10**(2*i)
+        lam, V = get_stat_iteration_matrix(m, nu)
+        vector = np.reshape(V[:,index], (m,m))
+        plt.subplot(1,3,i+1)
+        X = np.arange(0, m)
+        Y = X
+        XX, YY = np.meshgrid(X,Y)
+        plt.figure(figsize = (10, 10))
+        cp=plt.contourf(XX,YY,vector)
+        plt.xlabel("absolute eigenvalue={0:7.4f}".format(lam[index]))
+        plt.colorbar(cp)
+        plt.title(r'{0}-th eigenvector of the given stationary iterationmatrix with $\nu$ = {1} '.format(-index,nu))
+m = 31
+nu = 100
+omega = 2/3
+index = -10
+
+plot_eigenvector_stat_jac()
+#print_eigenvector_stat(m,nu,index)
+#print_eigenvector(m, nu, omega, index)
 

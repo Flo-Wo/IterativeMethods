@@ -187,6 +187,7 @@ return($u$)
 %% ====================================================================
 
 \subsection{Convergence Analysis}
+\label{seq:ConvergenceAnalysis}
 Now, we solve the system (\ref{eq:normalOptimalitySystem}) by the stationary iteration
 \begin{equation}
 \vec{u}^{n+1} = -\frac{1}{\nu} A^{-2}\vec{u}^n + \frac{1}{\nu} A^{-1} (\vec{y}_d-A^{-1}\vec{f})
@@ -326,7 +327,7 @@ condition number is getting better as $\nu$ increases, as the system is getting 
 
 %% ====================================================================
 
-In our last section we use multigrid methods to solve our problems \eqref{eq:normalOptimalitySystem} and \ref{eq:factoredOptimalitySystem}. These problems can be derived by discretization, as shown in the introduction. So we are able to apply multigrid methods. We have already seen two stationary methods:
+In our last section we use multigrid methods to solve our problems \eqref{eq:normalOptimalitySystem} and \ref{eq:factoredOptimalitySystem}. These problems can be derived by discretization, as shown in the introduction. So we are able to apply multigrid methods. We have already seen two stationary iterations:
 \begin{equation}
 \vec{u}^{n+1}    = - \frac{1}{\nu} A^{-2} \vec{u}^n+ \vec{f}
 \label{eq: stationaryMethod}
@@ -340,9 +341,11 @@ In the following we will refer to \eqref{eq: stationaryMethod} as the stationary
 dampedJacobi}, which is called damped Jacobi method with damping parameter $\omega \in (0,1] $. We used \eqref{eq: stationaryMethod} to solve  
 \eqref{eq:normalOptimalitySystem} and \eqref{eq: dampedJacobi} to solve \eqref{eq:factoredOptimalitySystem}. Now we want to apply \eqref{eq: 
 stationaryMethod} and \eqref{eq: dampedJacobi} as smoothers in a multigrid method. In both multigrid methods we use the interpolation matrix $P
-$ and the full weighting restriction matrix $R:= \frac{1}{2} P^T$  in our coarse correction step. Furthermore we do three Pre-Smoothing and 
-three Post-Smoothing steps. 
-
+$ and the full weighting restriction matrix $R:= \frac{1}{2} P^T$  in our coarse correction step. Furthermore we do one Pre-Smoothing and one Post-Smoothing step. Notice that we use the galerkin approach for our coarser matrix:
+\begin{equation}
+	C_{H}= R \cdot C \cdot P
+\end{equation}
+where $C$ is our system. It can be $\nu \Id +A^{-2}$ in the first case an in the second one $\Id +\nu A^2$, where $A$ is the Laplacian matrix divided by the grid size $h^2$. Using instead a $C_H$, which arises by a smaller grid leads to non-convergence! 
 %% ====================================================================
 
 \subsection{Stationary Methods as Smoother}
@@ -358,17 +361,34 @@ stationary method. Therefore our stationary method converges faster for $\nu $ r
 	\caption{Number of iterations of multigrid in comparison with the stationary method for different $\nu$ and $m$}
 	\label{fig: multigridStationary}
 \end{figure}
-Now let us check, if our predictions were right. From figure \ref{fig: multigridStationary} we can observe, that our multigrid method converges 
-only for huge $\nu $. This can be explained by the fact, that our sationary method converges only for huge $\nu$. In this case the term $\nu 
-\Id$ dominates $\nu \Id + A^{-2}$ and we get a iteration which would be similar to a jacobi one. As bigger $m$ gets, $\nu$ needs to grow faster 
-to achieve this effect. Therefore our multigrid method is not independent of the size $m$, because our stationary method can stop converging 
-for $m$ rising. Though provided that our multigrid method converges, it needs only a few iterations. In this case our method is extremly quick  
+Now let us check, if our predictions were right. From figure \ref{fig: multigridStationary} we can observe, that our multigrid method even converges for small $\nu $. This can be explained by the fact, that our sationary method converges still converges for small $\nu$'s. Although we can't expect this behaviour continuing for $\nu$ decreasing. Moreover we can observe, that our method gets faster $\nu$ rising. So for very big $\nu$ the term $\nu 
+\Id$ dominates $\nu \Id + A^{-2}$ and we get a iteration which would be similar to a jacobi one. Furthermore we can see that our method converges extremly quick for our selection of $\nu$'s. It needs only two to five iterations, which is enormous regarding the independecy of the mesh size. This quality can be observed in nearly every row. Additionally we can observe that our method needs for our smal $\nu$'s only a few iterations more that for our big $\nu$'s. 
+In order to explain this kind of indepndency in $\nu$, we take a look at one low-frequency mode and monitor what happens, if we change $\nu$. Recalling our iteration matrix:
+\begin{equation}
+M^{-1}N = \frac{1}{\nu} A^{-2}
+\end{equation}
+we set $m=31$ and sort the eigenvalues by their absolute value in descending order. For the low frequency modes we choose the 10-th eigenvalue and the corresponding eigenvector as a representive of the low frequency modes. Now changing $\nu$ we obtain:
+\begin{figure}[h!]
+	\includegraphics[scale=0.4]{./imgs/10_eigenvector_of_stat_nu_001}
+	\caption{10'th eigenvector of the given stationary method iteration matrix}
+	\label{fig:001_ev_stat}
+\end{figure}
+\begin{figure}[h!]
+	\includegraphics[scale=0.4]{./imgs/10_eigenvector_of_stat_nu_1}
+	\caption{10'th eigenvector of the given stationary method iteration matrix}
+	\label{fig:1_ev_stat}
+\end{figure}
+\begin{figure}[h!]
+	\includegraphics[scale=0.4]{./imgs/10_eigenvector_of_stat_nu_100}
+	\caption{10'th eigenvector of the given stationary method iteration matrix}
+	\label{fig:100_ev_stat}
+\end{figure}
 
-
+From these pictures we get, that there are huge differences in the absolute values of the eigenvectors. As a result $\nu$ highly determines, whether the stationary method converges or not, but this is already explained in section \ref{seq:ConvergenceAnalysis}. The second courius fact regards the plot of the eigenvectors. The plots of the different eigenvectors are pretty similar, although $\nu$ is changing. As a consequence we can interpoline these eigenvectors on a coarser grid, still for small $\nu$. Therefore our coarse correction step produces a very good corection. This explains the small differences of iterations steps in our multigrid method, though changing $\nu$.
 %% ====================================================================
 
 \subsection{Damped Jacobi as Smoother}
-Now we want to analyse the multigrid method with damped jacobi as smoother. We set $\omega= 0.5$, so we go half the way of every step. Let's 
+Now we want to analyse the multigrid method with damped jacobi as smoother. We set $\omega= \frac{2}{3}$, so we use the optimal $\omega$ for the Laplace eqution. Let's 
 make some predictions what happens, if we run our multigrid method. First we expect, that the multigrid method will be faster for shrinking $
 \nu$ and slower for bigger $\nu$. Because of $I + \nu A^2$ is diagonal dominant for small $\nu$, and Jacobi converges for such systems. For 
 rising $\nu$, we'll lose this effect. Nevertheless, $A^2$ is block tridiagonal:
@@ -390,7 +410,26 @@ problems with small $\nu$. Though for very small $\nu$ we come close to:
 \Id   \vec{v} = \vec{f}
 \] 
 and the solution isn't so meaningful.
-Moreover we can see, that the multigrid method converges slower for $\nu$ rising. So thats again, what we predicted. From figure \ref*{fig: 
-multigridJacobi} we really see, that our multigrid method is independent of the size $m$. We are able to observe this phenomenon in nearly 
-every row.
+Moreover we can see, that the multigrid method converges slower for $\nu$ rising.So thats again, what we predicted. But we didn't expect our method getting slower to such an extend. Notice that the multigrid method really shows it's worth in the independency we observe in every row.
+In the next lines we'll take a look at one low mode from our jacobi iteration matrix  :
+\begin{equation}
+	M^{-1}N= \omega D^{-1}  (\frac{1}{\omega } D (\Id + \nu A^2))
+\end{equation}
+and observe what hapenns, if we change $\nu$. Then we can explain the phenomenon of our method loosing speed while $\nu$ increases.In the following we use $\omega=\frac{2}{3}$, $m=31$  and we obtain these eigenvectors: \par
+\begin{figure}[h!]
+	\includegraphics[scale=0.4]{./imgs/5_eigenvector_of_jac_nu_001}
+	\caption{5'th eigenvector of damped jacobi iteration matrix}
+	\label{fig:001_ev}
+\end{figure}
+\begin{figure}[h!]
+	\includegraphics[scale=0.4]{./imgs/5_eigenvector_of_jac_nu_1}
+	\caption{5'th eigenvector of damped jacobi iteration matrix}
+	\label{fig:1_ev}
+\end{figure}
+\begin{figure}[h!]
+	\includegraphics[scale=0.4]{./imgs/5_eigenvector_of_jac_nu_100}
+	\caption{5'th eigenvector of damped jacobi iteration matrix}
+	\label{fig:100_ev}
+\end{figure}
+Notice again we sorted the absolute eigenvalues from highest to lowest and choose the 5'th eigenvector as a representive of the low frequncy eigenvectors. Now from our figures \ref*{fig:001_ev},\ref*{fig:1_ev} and \ref*{fig:100_ev} we can obtain, that the corresponding eigenvalues of our eigenvectors grow. That's why convergence for damped jacobi isn't guaranteed for every $\nu$. But this finding is presented in \ref*{sec:DampedJacobi}. However the growth in comparison to the growth of $\nu$ is still very small in comparison to the growth in our first multigrid method. Now the most interesting result provides the plot of the eigenvector. For a very small $\nu$ our eigenvetor looks realy smooth, see \ref*{fig:001_ev}. So our restriction matrix can interpoline this eigenvector pretty well on a coarser grid. Thus our coarse correction step should be able to produce a strong correction. However for $\nu$ rising the eigenvector gets angular. Therefore it shouldn't be possible to interpoline the eigenvectors \ref*{fig:1_ev},\ref*{fig:100_ev} easily. This effect along with damped jacobi getting slower for rising $\nu$ explains, why our damped jacobi multigrid method gets significantly slower for rising $\nu$. 
 \end{document}
